@@ -4,6 +4,7 @@ import { gsap, prefiereMenosMovimiento } from "../lib/gsap.js";
 import { Reveal } from "../components/Reveal.jsx";
 import { Espiral } from "../components/Espirales.jsx";
 import { MARCA, VALORES, EQUIPO, IDENTIDAD } from "../data/marca.js";
+import { asset } from "../lib/asset.js";
 
 /** Bloques de color de la paleta para la rejilla de valores. */
 const bloques = [
@@ -214,7 +215,7 @@ export default function Nosotros() {
         <Reveal delay={0.15}>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <a
-              href="/docs/manual-de-marca.pdf"
+              href={asset("/docs/manual-de-marca.pdf")}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full superficie-caribe px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.16em] text-crema sombra-suave transition-all duration-500 hover:-translate-y-1 hover:sombra-flotante"

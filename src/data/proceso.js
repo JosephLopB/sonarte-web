@@ -1,3 +1,4 @@
+import { asset } from "../lib/asset.js";
 /**
  * Proceso creativo del proyecto transmedia, para la línea de tiempo de /proceso.
  * Cada etapa puede tener imágenes reales o un hueco pendiente (media pendiente de exportar).
@@ -31,7 +32,7 @@ export const ETAPAS = [
     herramienta: "Illustrator · Proceso de ficha de personaje",
     texto:
       "Cada personaje nace en ficha: deseo, necesidad, herida y secreto. Joe se dibuja en tres edades con vestuario y lenguaje corporal propios, y se explora su rango emocional en la hoja de emociones antes de llegar a la versión final.",
-    imagenes: ["/img/joe-nino.png", "/img/joe-joven.png", "/img/joe-adulto.png"],
+    imagenes: [asset("/img/joe-nino.png"), asset("/img/joe-joven.png"), asset("/img/joe-adulto.png")],
     hueco: null,
   },
   {
@@ -42,9 +43,9 @@ export const ETAPAS = [
     texto:
       "Quince escenarios ilustrados llevan la historia del teatro vacío a la lluvia del 26 de julio: calle, seminario, bar, radio, bus, patio, Cartagena colonial, carnaval y más. El arte vectorial mantiene el color y la luz del Caribe.",
     imagenes: [
-      "/escenarios/esc-calle.jpg",
-      "/escenarios/esc-patio.jpg",
-      "/escenarios/esc-carnaval.jpg",
+      asset("/escenarios/esc-calle.jpg"),
+      asset("/escenarios/esc-patio.jpg"),
+      asset("/escenarios/esc-carnaval.jpg"),
     ],
     hueco: null,
   },
@@ -55,7 +56,7 @@ export const ETAPAS = [
     herramienta: "Illustrator · Sistema de identidad",
     texto:
       "El espiral del isotipo condensa la idea de la marca: sonido, ciclos y movimiento. Se construyen el isologo, la paleta cálida del Caribe, las tipografías y las texturas de olas; todo queda sistematizado en el Manual de marca y el PitchBook.",
-    imagenes: ["/marca/isotipo.png", "/marca/logo.png"],
+    imagenes: [asset("/marca/isotipo.png"), asset("/marca/logo.png")],
     hueco: null,
   },
   {
@@ -85,7 +86,7 @@ export const ETAPAS = [
     herramienta: "InDesign · Revista digital",
     texto:
       "La revista SonArte reúne la investigación, ilustración y el detrás de cámaras en una publicación digital maquetada y publicada en Adobe, puente entre el archivo musical y la pantalla.",
-    imagenes: ["/marca/portada.png"],
+    imagenes: [asset("/marca/portada.png")],
     hueco: null,
   },
   {

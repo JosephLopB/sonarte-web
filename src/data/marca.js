@@ -1,3 +1,4 @@
+import { asset } from "../lib/asset.js";
 /**
  * Identidad y contenido de la marca SonArte.
  * Textos tomados del Manual de marca, PitchBook y la versión anterior del sitio.
@@ -8,9 +9,9 @@ export const MARCA = {
   eslogan: "El folclore colombiano vuelve a sonar, dibujado.",
   intro:
     "SonArte es una editorial web multimedia que revive las raíces del Caribe a través de un cómic digital interactivo transmedia inspirado en la música de Joe Arroyo y los ritmos tropicales. Mezclamos arte, identidad y tecnología para las nuevas generaciones.",
-  logo: "/img/logo-full.png",
-  isotipo: "/marca/isotipo.png",
-  espiral: "/marca/espiral-hero.svg",
+  logo: asset("/img/logo-full.png"),
+  isotipo: asset("/marca/isotipo.png"),
+  espiral: asset("/marca/espiral-hero.svg"),
   revistaUrl: "https://indd.adobe.com/view/c9583718-0fac-4d40-bb19-a8448eefdf6b",
   comicUrl: "https://comic-centurion.lovable.app",
   mision:
@@ -72,14 +73,14 @@ export const EQUIPO = [
     rol: "Dirección de arte e ilustración",
     texto:
       "Construye los personajes, define el trazo y traduce la música en color y movimiento.",
-    img: "/img/equipo-joseph.jpg",
+    img: asset("/img/equipo-joseph.jpg"),
   },
   {
     nombre: "Yurani",
     rol: "Narrativa y diseño editorial",
     texto:
       "Investiga el folclore, escribe los guiones y da forma a la revista y a la voz de la marca.",
-    img: "/img/Yura.png",
+    img: asset("/img/Yura.png"),
     estilo: "tarjeta",
   },
 ];

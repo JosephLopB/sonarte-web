@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Espiral } from "./Espirales.jsx";
 import { MARCA } from "../data/marca.js";
+import { asset } from "../lib/asset.js";
 
 export function SiteFooter() {
   return (
@@ -41,12 +42,12 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
-              <a className="transition-colors hover:text-turquesa" href="/docs/manual-de-marca.pdf" target="_blank" rel="noreferrer">
+              <a className="transition-colors hover:text-turquesa" href={asset("/docs/manual-de-marca.pdf")} target="_blank" rel="noreferrer">
                 Manual de marca (PDF)
               </a>
             </li>
             <li>
-              <a className="transition-colors hover:text-turquesa" href="/docs/pitchbook.pdf" target="_blank" rel="noreferrer">
+              <a className="transition-colors hover:text-turquesa" href={asset("/docs/pitchbook.pdf")} target="_blank" rel="noreferrer">
                 PitchBook (PDF)
               </a>
             </li>

@@ -1,22 +1,23 @@
+import { asset } from "../lib/asset.js";
 /** Los tres Joes del cómic, con notas de la ficha de personaje (Información personajes.docx). */
 
 export const PERSONAJES = [
   {
-    src: "/img/joe-nino.png",
+    src: asset("/img/joe-nino.png"),
     nombre: "Joe niño",
     edad: "10 años",
     nota: "Hiperactivo, amable y valiente. Sueña con cantar en un escenario.",
     pose: "El niño del barrio: sentado con una lata en la cabeza y un cuaderno, escondiendo un secreto.",
   },
   {
-    src: "/img/joe-joven.png",
+    src: asset("/img/joe-joven.png"),
     nombre: "Joe joven",
     edad: "15 – 20 años",
     nota: "Soñador y decidido, con el deseo de salir adelante con la música.",
     pose: "El grito que se abre paso: la voz que ya no cabe en la calle.",
   },
   {
-    src: "/img/joe-adulto.png",
+    src: asset("/img/joe-adulto.png"),
     nombre: "Joe en su auge",
     edad: "30 – 40 años",
     nota: "Apasionado, carismático y creativo. La salsa hecha voz.",

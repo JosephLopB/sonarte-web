@@ -7,6 +7,7 @@ import { VideoAutodetectado } from "../components/VideoAutodetectado.jsx";
 import { ESCENARIOS } from "../data/escenarios.js";
 import { PERSONAJES } from "../data/personajes.js";
 import { MARCA } from "../data/marca.js";
+import { asset } from "../lib/asset.js";
 
 export default function Comic() {
   const [cargando, setCargando] = useState(true);
@@ -55,7 +56,7 @@ export default function Comic() {
         {/* Teaser */}
         <Reveal dir="scale" delay={0.1} className="mt-12">
           <VideoAutodetectado
-            ruta="/media/teaser/teaser.mp4"
+            ruta={asset("/media/teaser/teaser.mp4")}
             titulo="Teaser del proyecto"
             nota="Pega tu video en public/media/teaser/teaser.mp4 y aparecerá aquí automáticamente."
           />
@@ -85,7 +86,7 @@ export default function Comic() {
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 bg-salmon">
               <div className="anim-rebote-logo">
                 <img
-                  src="/img/logo-icon.png"
+                  src={asset("/img/logo-icon.png")}
                   alt="Cargando el cómic SonArte"
                   className="w-24 rounded-full bg-crema p-3 sombra-flotante"
                 />

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, NavLink as RRNavLink, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { gsap } from "../lib/gsap.js";
+import { asset } from "../lib/asset.js";
 
 /** Rutas con fondo oscuro donde la nav invierte sus colores. */
 const RUTAS_OSCURAS = [];
@@ -99,13 +100,13 @@ export function SiteNav() {
           >
             <img
               ref={logoCompleto}
-              src="/img/logo-full.png"
+              src={asset("/img/logo-full.png")}
               alt="Isologo SonArte"
               className="absolute inset-0 h-full w-full object-contain"
             />
             <img
               ref={logoIcono}
-              src="/marca/isotipo.png"
+              src={asset("/marca/isotipo.png")}
               alt=""
               aria-hidden="true"
               className="absolute inset-0 h-full w-full object-contain opacity-0"
