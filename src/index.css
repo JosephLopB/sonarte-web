@@ -1,0 +1,247 @@
+@import "tailwindcss";
+
+/*
+ * SonArte — Sistema de diseño
+ * Colores y tipografías exclusivos del Manual de Marca SonArte.
+ * Terracota #A25637 · Marrón #552714 · Crema #FFFDE8
+ * Turquesa claro #5ED5B7 · Turquesa medio #37A2A1 · Verde oscuro #0C5555
+ * Salmón #EF9069 · Negro #000000
+ */
+
+@theme {
+  --font-sans: "Source Sans 3", system-ui, sans-serif;
+  --font-serif: "EB Garamond", Georgia, serif;
+  --font-display: "EB Garamond", Georgia, serif;
+  --font-marca: "Muthiara", "EB Garamond", cursive;
+  --font-impacto: "Akira Expanded", "Arial Black", sans-serif;
+  --font-neutra: "MyriadPro", "Source Sans 3", sans-serif;
+
+  --color-terracota: oklch(0.5375 0.1098 42.28);
+  --color-marron: oklch(0.3324 0.0747 42.13);
+  --color-crema: oklch(0.99 0.0275 102.45);
+  --color-turquesa: oklch(0.7965 0.1164 174.08);
+  --color-turquesa-medio: oklch(0.6524 0.0953 194.18);
+  --color-verde-oscuro: oklch(0.4089 0.0658 194.89);
+  --color-salmon: oklch(0.7447 0.1272 42.8);
+  --color-noche: oklch(0.19 0.018 45);
+
+  --color-background: var(--color-crema);
+  --color-foreground: var(--color-marron);
+  --color-card: oklch(0.9365 0.0379 86.89);
+  --color-muted-foreground: oklch(0.4802 0.0658 45);
+  --color-border: oklch(0.5375 0.1098 42.28 / 22%);
+  --color-ring: var(--color-terracota);
+
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-rebote: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:root {
+  --gradient-mar: linear-gradient(
+    180deg,
+    var(--color-crema) 0%,
+    oklch(0.93 0.055 140) 35%,
+    var(--color-turquesa) 70%,
+    var(--color-turquesa-medio) 100%
+  );
+  --gradient-caribe: linear-gradient(135deg, var(--color-terracota) 0%, var(--color-salmon) 100%);
+  --gradient-profundo: linear-gradient(160deg, var(--color-verde-oscuro) 0%, var(--color-marron) 100%);
+  --gradient-espuma: linear-gradient(180deg, var(--color-turquesa) 0%, var(--color-crema) 65%, var(--color-crema) 100%);
+
+  --shadow-suave: 0 10px 30px -12px oklch(0.3324 0.0747 42.13 / 30%);
+  --shadow-flotante: 0 24px 50px -20px oklch(0.3324 0.0747 42.13 / 45%);
+  --shadow-cartoon: 6px 6px 0 0 var(--color-marron);
+}
+
+@font-face {
+  font-family: "Muthiara";
+  src: url("/fonts/muthiara.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akira Expanded";
+  src: url("/fonts/akira-expanded.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MyriadPro";
+  src: url("/fonts/myriadpro.otf") format("opentype");
+  font-display: swap;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* ---------- Utilidades de marca ---------- */
+
+@utility superficie-mar {
+  background-image: var(--gradient-mar);
+}
+
+@utility superficie-caribe {
+  background-image: var(--gradient-caribe);
+}
+
+@utility superficie-profunda {
+  background-image: var(--gradient-profundo);
+}
+
+@utility superficie-espuma {
+  background-image: var(--gradient-espuma);
+}
+
+@utility sombra-suave {
+  box-shadow: var(--shadow-suave);
+}
+
+@utility sombra-flotante {
+  box-shadow: var(--shadow-flotante);
+}
+
+@utility borde-cartoon {
+  border: 2px solid var(--color-marron);
+  box-shadow: var(--shadow-cartoon);
+}
+
+@utility texto-espiral {
+  background-image: var(--gradient-caribe);
+  background-clip: text;
+  color: transparent;
+}
+
+/* Textura de espuma de mar */
+@utility textura-espuma {
+  position: relative;
+  background-color: var(--color-turquesa);
+  background-image:
+    radial-gradient(circle at 12% 22%, oklch(0.99 0.0275 102.45 / 65%) 0 8px, transparent 9px),
+    radial-gradient(circle at 34% 68%, oklch(0.99 0.0275 102.45 / 45%) 0 14px, transparent 15px),
+    radial-gradient(circle at 68% 18%, oklch(0.99 0.0275 102.45 / 55%) 0 11px, transparent 12px),
+    radial-gradient(circle at 84% 74%, oklch(0.99 0.0275 102.45 / 40%) 0 18px, transparent 19px),
+    radial-gradient(circle at 52% 40%, oklch(0.99 0.0275 102.45 / 35%) 0 6px, transparent 7px),
+    linear-gradient(180deg, var(--color-turquesa) 0%, var(--color-turquesa-medio) 100%);
+  background-size:
+    180px 180px,
+    260px 260px,
+    220px 220px,
+    300px 300px,
+    140px 140px,
+    100% 100%;
+}
+
+/* Trama de puntos estilo cómic */
+@utility trama-benday {
+  background-image: radial-gradient(oklch(0.7447 0.1272 42.8 / 45%) 1.5px, transparent 1.6px);
+  background-size: 8px 8px;
+}
+
+/* ---------- Animaciones ---------- */
+
+@keyframes flotar {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(3deg);
+  }
+}
+
+@keyframes deriva {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes rebote-logo {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-22px) scale(1.06);
+    opacity: 0.45;
+  }
+}
+
+@keyframes lava {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(6%, -8%) scale(1.18);
+  }
+  66% {
+    transform: translate(-7%, 7%) scale(0.9);
+  }
+}
+
+@keyframes girar-lento {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@utility anim-flotar {
+  animation: flotar 7s var(--ease-smooth) infinite;
+}
+
+@utility anim-deriva {
+  animation: deriva 28s linear infinite;
+}
+
+@utility anim-rebote-logo {
+  animation: rebote-logo 1.6s var(--ease-rebote) infinite;
+}
+
+@utility anim-lava {
+  animation: lava 22s ease-in-out infinite;
+}
+
+@utility anim-girar-lento {
+  animation: girar-lento 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
