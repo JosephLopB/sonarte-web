@@ -56,7 +56,7 @@ export function FinalComic({ onVolver, onCofre }) {
         <div className="mt-12 grid max-w-xl gap-3 text-left sm:grid-cols-3">
           {[
             { t: "Historia", d: "Narrativa e investigación de Joseph." },
-            { t: "Ilustración", d: "Dirección de arte e ilustración de Joseph." },
+            { t: "Ilustración", d: "Dirección de arte e ilustración de Yurany." },
             { t: "Sonido", d: "Música, voces y ambientes del cómic." },
           ].map((c) => (
             <div key={c.t} className="rounded-2xl border border-crema/10 bg-crema/[0.03] p-3.5">
