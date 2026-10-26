@@ -1,12 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { gsap, prefiereMenosMovimiento } from "../lib/gsap.js";
 import { Reveal } from "../components/Reveal.jsx";
 import { FondoGrafico } from "../components/FondoGrafico.jsx";
 import { VideoAutodetectado } from "../components/VideoAutodetectado.jsx";
 import { ESCENARIOS } from "../data/escenarios.js";
 import { PERSONAJES } from "../data/personajes.js";
-import { MARCA } from "../data/marca.js";
 import { asset } from "../lib/asset.js";
 
 export default function Comic() {
@@ -51,6 +51,15 @@ export default function Comic() {
             «Joe Arroyo: El Centurión de la Noche» — prólogo y tres capítulos en un cómic digital
             interactivo transmedia. Explora, escucha y profundiza mientras lees.
           </p>
+          <div className="mt-7 flex justify-center">
+            <Link
+              to="/comic/experiencia"
+              className="inline-flex items-center gap-2.5 rounded-full bg-verde-oscuro px-7 py-3.5 text-sm font-bold uppercase tracking-[0.16em] text-crema shadow-[0_16px_36px_-20px_oklch(0.08_0.02_42/0.9)] transition hover:-translate-y-0.5 hover:brightness-110"
+            >
+              <Play className="size-4 fill-current" />
+              Vivir la experiencia
+            </Link>
+          </div>
         </Reveal>
 
         {/* Teaser */}
@@ -169,18 +178,16 @@ export default function Comic() {
             <p className="font-serif text-sm uppercase tracking-[0.35em] text-crema/85">La experiencia completa</p>
             <h2 className="mt-4 font-serif text-4xl text-crema sm:text-5xl">Ábrelo y sube el volumen</h2>
             <p className="mx-auto mt-4 max-w-xl text-crema/90">
-              17 escenas con sonido, exploración libre y ventanas transmedia. El cómic interactivo
-              se abre en una experiencia a pantalla completa.
+              Prólogo y tres capítulos con sonido, exploración libre y ventanas transmedia. El cómic
+              interactivo se abre en una experiencia a pantalla completa.
             </p>
-            <a
-              href={MARCA.comicUrl}
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to="/comic/experiencia"
               className="mt-8 inline-flex items-center gap-3 rounded-full bg-crema px-10 py-4 font-serif text-lg text-marron transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
             >
               Entrar al cómic interactivo
-              <ExternalLink className="size-5" />
-            </a>
+              <ArrowRight className="size-5" />
+            </Link>
           </div>
         </Reveal>
       </div>

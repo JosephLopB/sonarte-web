@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Escena Joe Arroyo – SonArte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Lato',Calibri,sans-serif}
+#stage{position:absolute;left:50%;top:50%;width:1990px;height:1080px;transform-origin:0 0;background:#000;overflow:hidden;user-select:none}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+video.on{opacity:1}
+#box{position:absolute;left:30px;right:30px;bottom:0;height:330px;padding:44px 52px;background:rgba(143,143,130,.95);opacity:0;transform:translateY(40px);transition:.5s;cursor:pointer}
+#box.show{opacity:1;transform:none}
+#who{font-weight:900;font-size:50px;color:#6b2e14;margin-bottom:16px}
+#txt{font-weight:900;font-size:41px;line-height:1.3;color:#0a0a0a;min-height:110px}
+#txt i{display:inline-block;width:3px;height:.9em;background:#0a0a0a;margin-left:3px;vertical-align:-4px;animation:b .7s steps(1) infinite}
+@keyframes b{50%{opacity:0}}
+.bar{position:absolute;top:24px;right:30px;display:flex;gap:12px;z-index:5}
+.btn{font:900 26px Lato,sans-serif;border:3px solid #6b2e14;background:rgba(143,143,130,.92);color:#2a1006;padding:10px 22px;cursor:pointer;border-radius:4px}
+.btn:hover,.btn:focus-visible{background:#f0e4c8;outline:none}
+#cta{position:absolute;left:50%;top:380px;transform:translateX(-50%);font-size:44px;padding:22px 54px;z-index:6;display:none;animation:p 1.6s ease-in-out infinite}
+@keyframes p{50%{transform:translateX(-50%) scale(1.06)}}
+#start{position:absolute;inset:0;z-index:9;background:#000;display:flex;align-items:center;justify-content:center}
+.note{position:absolute;font-size:56px;color:#f0e4c8;pointer-events:none;text-shadow:0 2px 8px #000;animation:f 1.8s ease-out forwards;z-index:4}
+@keyframes f{to{transform:translateY(-260px) rotate(25deg);opacity:0}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <video id="v1" src="Escenario1.mp4" playsinline preload="auto"></video>
+  <video id="v2" src="Escenario2.mp4" playsinline preload="auto"></video>
+  <div class="bar" id="bar" hidden>
+    <button class="btn" id="bPlay">⏸ Pausa</button>
+    <button class="btn" id="bClap">👏 Aplaudir</button>
+    <button class="btn" id="bMute">🔊 Público</button>
+  </div>
+  <button class="btn" id="cta"></button>
+  <div id="box"><div id="who"></div><div id="txt"></div></div>
+  <div id="start"><button class="btn" id="go" style="font-size:40px;padding:20px 60px">▶ Comenzar</button></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const stage=$('stage'),v1=$('v1'),v2=$('v2'),box=$('box'),who=$('who'),txt=$('txt'),cta=$('cta');
+function fit(){const s=Math.min(innerWidth/1990,innerHeight/1080);stage.style.transform=`scale(${s}) translate(-50%,-50%)`;}
+addEventListener('resize',fit);fit();
+
+/* Guiones: from/to = fracción de la duración del video en que se escribe cada línea */
+const S1=[{who:'Centurión',text:'Con Fruko y sus Tesos, Joe se volvió el sonido de toda la costa. Pero muy pronto entendió que la fiesta de otros no bastaba: necesitaba una propia.',from:.04,to:.88}];
+const S2=[{who:'JOE',text:'Con esta orquesta le voy a cantar hasta a la historia que nadie más se atreve a cantar.',from:.03,to:.36},
+          {who:'El Centurión',text:'Así nació “Rebelión”, la canción que le cantó a la historia de su propia gente y se volvió un himno contra el maltrato en toda América Latina.',from:.42,to:.92}];
+
+/* Sonido de público (sintetizado, volumen bajito) */
+let ac,crowdGain,muted=false;
+function noiseBuf(sec){const b=ac.createBuffer(1,ac.sampleRate*sec,ac.sampleRate),d=b.getChannelData(0);let l=0;for(let i=0;i<d.length;i++){l=(l+0.02*(Math.random()*2-1))/1.02;d[i]=l*3.5}return b}
+function startCrowd(){
+  if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();}
+  if(ac.state==='suspended')ac.resume();
+  crowdGain=ac.createGain();crowdGain.gain.value=0;crowdGain.connect(ac.destination);
+  [[500,.9],[1100,.5],[2200,.25]].forEach(([f,g])=>{
+    const s=ac.createBufferSource();s.buffer=noiseBuf(4);s.loop=true;
+    const bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.value=f;bp.Q.value=.7;
+    const lfo=ac.createOscillator(),lg=ac.createGain(),mg=ac.createGain();
+    lfo.frequency.value=.15+Math.random()*.3;lg.gain.value=g*.4;mg.gain.value=g;lfo.connect(lg);lg.connect(mg.gain);
+    s.connect(bp);bp.connect(mg);mg.connect(crowdGain);s.start();lfo.start();
+  });
+  setCrowd(.07);
+}
+function setCrowd(v,t=1.2){if(crowdGain)crowdGain.gain.linearRampToValueAtTime(muted?0:v,ac.currentTime+t)}
+function applause(){
+  if(!ac)return;const n=70,t0=ac.currentTime;
+  for(let i=0;i<n;i++){
+    const t=t0+Math.random()*2.4,s=ac.createBufferSource(),b=ac.createBuffer(1,ac.sampleRate*.04,ac.sampleRate),d=b.getChannelData(0);
+    for(let k=0;k<d.length;k++)d[k]=(Math.random()*2-1)*(1-k/d.length);
+    s.buffer=b;const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=1500+Math.random()*2500;
+    const g=ac.createGain();g.gain.value=(.25+Math.random()*.3)*(1-(t-t0)/3);
+    s.connect(hp);hp.connect(g);g.connect(ac.destination);s.start(t);
+  }
+  for(let i=0;i<8;i++)setTimeout(()=>note(300+Math.random()*1400,500+Math.random()*350),i*120);
+}
+
+/* Máquina de escribir sincronizada con el video */
+let cur=null,raf=0;
+function render(script,v){
+  const p=v.duration?v.currentTime/v.duration:0;
+  let seg=script[0];for(const s of script)if(p>=s.from)seg=s;
+  const k=Math.max(0,Math.min(1,(p-seg.from)/(seg.to-seg.from)));
+  who.textContent=seg.who;
+  const n=Math.floor(seg.text.length*k);
+  txt.innerHTML=seg.text.slice(0,n).replace(/</g,'&lt;')+(n<seg.text.length?'<i></i>':'');
+}
+function loop(){if(cur){render(cur.script,cur.v);raf=requestAnimationFrame(loop)}}
+function play(v,script,after){
+  cur={v,script};v.currentTime=0;v.classList.add('on');box.classList.add('show');
+  v.play();cancelAnimationFrame(raf);loop();
+  v.onended=()=>{const l=script[script.length-1];txt.textContent=l.text;who.textContent=l.who;cancelAnimationFrame(raf);after()};
+}
+function scene1(){
+  cta.style.display='none';v2.classList.remove('on');v2.pause();
+  setCrowd(.07);play(v1,S1,()=>{setCrowd(.02,2.5);cta.textContent='Continuar ▶';cta.onclick=scene2;cta.style.display='block'});
+}
+function scene2(){
+  cta.style.display='none';v1.classList.remove('on');setCrowd(0,1.5);
+  play(v2,S2,()=>{cta.textContent='↺ Ver de nuevo';cta.onclick=scene1;cta.style.display='block'});
+}
+
+/* Interactividad */
+function note(x,y){const e=document.createElement('div');e.className='note';e.textContent=['♪','♫','♬'][Math.floor(Math.random()*3)];e.style.left=x+'px';e.style.top=y+'px';stage.appendChild(e);setTimeout(()=>e.remove(),1900)}
+stage.addEventListener('pointerdown',e=>{if(e.target.closest('button,#box'))return;const r=stage.getBoundingClientRect(),s=r.width/1990;note((e.clientX-r.left)/s-20,(e.clientY-r.top)/s-20)});
+box.addEventListener('click',()=>{ /* clic en el cuadro: salta al final del texto actual */
+  if(!cur||cur.v.paused)return;const v=cur.v,p=v.currentTime/v.duration;
+  const seg=[...cur.script].reverse().find(s=>p>=s.from)||cur.script[0];
+  v.currentTime=Math.min(v.duration-.05,v.duration*seg.to);
+});
+$('bPlay').onclick=()=>{if(!cur)return;const v=cur.v;if(v.paused&&!v.ended){v.play();cancelAnimationFrame(raf);loop();ac&&ac.resume();$('bPlay').textContent='⏸ Pausa'}else{v.pause();$('bPlay').textContent='▶ Seguir'}};
+$('bClap').onclick=applause;
+$('bMute').onclick=()=>{muted=!muted;if(crowdGain)crowdGain.gain.value=muted?0:(cur&&cur.v===v1?.07:0);$('bMute').textContent=muted?'🔇 Público':'🔊 Público'};
+$('go').onclick=()=>{$('start').style.display='none';$('bar').hidden=false;startCrowd();scene1()};
+</script>
+</body>
+</html>

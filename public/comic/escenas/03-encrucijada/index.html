@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Escena Seminario y Bar – SonArte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Lato',Calibri,sans-serif}
+#stage{position:absolute;left:0;top:0;width:1990px;height:1080px;transform-origin:0 0;background:#0b0907;overflow:hidden;user-select:none}
+/* paneles de video */
+.pan{position:absolute;top:0;width:995px;height:1080px;overflow:hidden;cursor:default;outline:none;transition:transform .6s}
+#pS{left:0}#pB{left:995px}
+.pan video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) brightness(.42) contrast(.95);transition:filter .9s ease}
+.pan::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .8s;mix-blend-mode:soft-light}
+#pS::after{background:radial-gradient(ellipse at 50% 18%,rgba(255,236,170,.95),transparent 62%)}
+#pB::after{background:radial-gradient(ellipse at 50% 70%,rgba(255,150,60,.9),transparent 64%)}
+.pan.lit video{filter:none}
+.pan.lit::after{opacity:1}
+.pan.seen video{filter:grayscale(.15) brightness(.8)}
+.pan.seen.hov video,.pan.lit video{filter:none}
+.pan.pick{cursor:pointer}
+.pan.pick.hov{transform:scale(1.018);z-index:2}
+.pan.pick:not(.seen):not(.hov) video{animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{filter:grayscale(1) brightness(.42)}50%{filter:grayscale(.6) brightness(.62)}}
+.pan.pick.hov video{animation:none;filter:none}
+.pan .tag{position:absolute;top:34px;left:0;right:0;text-align:center;font-weight:900;font-size:46px;letter-spacing:4px;color:#f6ecd2;text-shadow:0 3px 14px #000;opacity:0;transition:opacity .8s}
+.pan.pick .tag,.pan.lit .tag{opacity:.95}
+.pan .ring{position:absolute;left:50%;top:44%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:5px solid rgba(255,244,214,.9);display:flex;align-items:center;justify-content:center;font-size:64px;color:#fff4d6;padding-left:10px;opacity:0;transform:scale(.7);transition:.4s;pointer-events:none;background:rgba(0,0,0,.25)}
+.pan.pick .ring{opacity:.85;animation:pulse 1.8s ease-in-out infinite}
+.pan.pick.hov .ring{opacity:1;background:rgba(255,235,170,.28)}
+.pan.lit .ring{opacity:0;animation:none}
+@keyframes pulse{0%,100%{transform:scale(.9)}50%{transform:scale(1.08)}}
+#div{position:absolute;left:994px;top:0;width:2px;height:100%;z-index:3;background:linear-gradient(to bottom,transparent,#e7c675,transparent);opacity:.7;pointer-events:none}
+#vig{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 52%,rgba(0,0,0,.55) 100%)}
+#fx{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}
+#hint{position:absolute;top:150px;left:0;right:0;text-align:center;z-index:6;font-weight:900;font-size:40px;color:#f6ecd2;text-shadow:0 3px 16px #000;opacity:0;transition:opacity 1s;pointer-events:none;letter-spacing:2px}
+#hint.on{opacity:1;animation:hb 2.2s ease-in-out infinite}
+@keyframes hb{50%{opacity:.45}}
+/* cuadro de texto */
+.box{position:absolute;left:30px;right:30px;bottom:0;height:300px;padding:40px 52px;background:rgba(143,143,130,.95);opacity:0;transform:translateY(40px);transition:.5s;z-index:8;pointer-events:none}
+.box.show{opacity:1;transform:none}
+.who{font-weight:900;font-size:50px;color:#6b2e14;margin-bottom:14px}
+.txt{font-weight:900;font-size:41px;line-height:1.3;color:#0a0a0a;min-height:110px}
+.txt i{display:inline-block;width:3px;height:.9em;background:#0a0a0a;margin-left:3px;vertical-align:-4px;animation:b .7s steps(1) infinite}
+@keyframes b{50%{opacity:0}}
+.btn{font:900 26px Lato,sans-serif;border:3px solid #6b2e14;background:rgba(143,143,130,.95);color:#2a1006;padding:10px 22px;cursor:pointer;border-radius:4px}
+.btn:hover,.btn:focus-visible{background:#f0e4c8;outline:none}
+.bar{position:absolute;top:24px;right:30px;display:none;gap:12px;z-index:9}
+#start{position:absolute;inset:0;z-index:20;background:#000;display:flex;align-items:center;justify-content:center}
+#stage.paused *{animation-play-state:paused!important}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="pan" id="pS" tabindex="0" role="button" aria-label="Ver el seminario"><video id="vS" playsinline preload="auto"></video><div class="tag" id="tS"></div><div class="ring">▶</div></div>
+  <div class="pan" id="pB" tabindex="0" role="button" aria-label="Ver el bar"><video id="vB" playsinline preload="auto"></video><div class="tag" id="tB"></div><div class="ring">▶</div></div>
+  <div id="div"></div>
+  <div id="vig"></div>
+  <canvas id="fx" width="1990" height="1080"></canvas>
+  <div id="hint">✦ Elige un recuerdo ✦</div>
+  <div class="box" id="box"><div class="who" id="who"></div><div class="txt" id="txt"></div></div>
+  <div class="bar" id="bar"><button class="btn" id="bPause">⏸ Pausa</button></div>
+  <div id="start"><button class="btn" id="go" style="display:none;font-size:40px;padding:20px 60px">▶ Comenzar</button></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const stage=$('stage'),box=$('box'),who=$('who'),txt=$('txt'),cv=$('fx'),gx=cv.getContext('2d'),bPause=$('bPause'),startEl=$('start'),goBtn=$('go'),hint=$('hint');
+
+/* ================= CONFIGURACIÓN (cambia aquí los nombres de tus archivos) ================= */
+const CFG={
+  audio:'Audio1.mp3',
+  seminario:{video:'seminario.mp4',etiqueta:'EL SEMINARIO',quien:'Padre del coro',texto:'Arroyo, esa voz que Dios te dio es para alabarlo a él.'},
+  bar:{video:'bartesca.mp4',etiqueta:'EL BAR',quien:'Dueño del bar',texto:'Canta otra, Joe, que la gente no se quiere ir.'}
+};
+const DUR_A=7.3,DUR_V=8;    // solo se usan si un archivo no carga
+const WHO='El Centurión';
+const T0='Pasaron los años. Ese niño de la lata de manteca se hizo adolescente, y su voz ya no cabía en un solo lugar.';
+const K={S:CFG.seminario,B:CFG.bar};
+$('tS').textContent=CFG.seminario.etiqueta;$('tB').textContent=CFG.bar.etiqueta;
+
+/* ================= ESCALA ================= */
+let scale=1;
+function fit(){scale=Math.min(innerWidth/1990,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1990*scale)/2}px,${(innerHeight-1080*scale)/2}px) scale(${scale})`}
+addEventListener('resize',fit);fit();
+function warn(msg){
+  let w=$('warn');
+  if(!w){w=document.createElement('div');w.id='warn';w.style.cssText='position:absolute;left:30px;top:20px;z-index:50;background:#b11917;color:#fff;font:700 26px Lato,sans-serif;padding:12px 22px;border-radius:6px;max-width:1500px';stage.appendChild(w)}
+  w.innerHTML+=msg+'<br>';
+  clearTimeout(w._t);w._t=setTimeout(()=>w.remove(),14000);
+}
+
+/* ================= AUDIO DE LA VOZ ================= */
+const au=new Audio();au.preload='auto';au.src=encodeURI(CFG.audio);
+au.addEventListener('error',()=>{au.bad=true;warn('No se pudo cargar "'+CFG.audio+'". Revisa que esté en la misma carpeta que index.html.')});
+let aT=0,aOn=false;
+const aok=()=>!au.bad&&au.duration>0;
+const aTime=()=>aok()?au.currentTime:aT, aDur=()=>aok()?au.duration:DUR_A, aDone=()=>aok()?au.ended:aT>=DUR_A;
+
+/* ================= VIDEOS ================= */
+const V={S:{el:$('vS'),pan:$('pS'),bad:false,t:0,on:false,seen:false},B:{el:$('vB'),pan:$('pB'),bad:false,t:0,on:false,seen:false}};
+for(const k in V){
+  const v=V[k];v.el.src=encodeURI(K[k].video);v.el.load();
+  v.el.addEventListener('loadeddata',()=>{try{if(v.el.currentTime<.05)v.el.currentTime=.1}catch(e){}});
+  v.el.addEventListener('error',()=>{v.bad=true;warn('No se pudo cargar "'+K[k].video+'". Revisa que esté en la misma carpeta que index.html.')});
+  v.el.addEventListener('ended',()=>vEnd(k));
+}
+const vok=k=>!V[k].bad&&V[k].el.duration>0;
+const vTime=k=>vok(k)?V[k].el.currentTime:V[k].t, vDur=k=>vok(k)?V[k].el.duration:DUR_V;
+
+/* ================= SONIDOS sintetizados ================= */
+let ac=null,sg=null,noiseBuf=null;
+function audioInit(){
+  if(ac)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  ac=new AC();sg=ac.createGain();sg.gain.value=.8;sg.connect(ac.destination);
+  const n=ac.sampleRate*2;noiseBuf=ac.createBuffer(1,n,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+}
+function partial(f,t,pk,dec,type,att){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(pk,t+(att||.008));g.gain.exponentialRampToValueAtTime(.0001,t+dec);o.connect(g);g.connect(sg);o.start(t);o.stop(t+dec+.05)}
+function bell(f,vol){if(!ac)return;const t=ac.currentTime;[[1,1],[2.01,.4],[3.02,.15],[4.2,.07]].forEach(([m,a])=>partial(f*m,t,(vol||.2)*a,2.6))}
+function pad(vol){if(!ac)return;const t=ac.currentTime;[261.63,329.63,392,523.25].forEach((f,i)=>partial(f,t+i*.05,(vol||.07),2.6,'triangle',.5))}   // acorde suave tipo órgano
+function clink(vol){if(!ac)return;const t=ac.currentTime;[[2637,1],[3520,.7],[4186,.4]].forEach(([f,a],i)=>partial(f,t+i*.012,(vol||.12)*a,.55))}
+function murmur(vol){if(!ac)return;const t=ac.currentTime,s=ac.createBufferSource();s.buffer=noiseBuf;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=900;f.Q.value=.7;const g=ac.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol||.08,t+.25);g.gain.exponentialRampToValueAtTime(.0001,t+1.3);s.connect(f);f.connect(g);g.connect(sg);s.start(t,Math.random()*1.2,1.4)}
+
+/* ================= PARTÍCULAS ================= */
+const P=[],NOTE=['♪','♫','♬'];
+function ripple(x,y,col){P.push({k:'r',x,y,vx:0,vy:0,t:0,life:1.2,col:col||'#f6ecd2'})}
+function notes(x,y,n,col){for(let i=0;i<n;i++)P.push({k:'n',x:x+(Math.random()-.5)*80,y:y+(Math.random()-.5)*30,vx:(Math.random()-.5)*30,vy:-70-Math.random()*60,t:-i*.15,life:3.4,ch:NOTE[Math.random()*3|0],ph:Math.random()*6,col:col||'#f3e2b3'})}
+function mote(x,y,col,up){P.push({k:'m',x,y,vx:(Math.random()-.5)*24,vy:(up?-1:-.4)*(25+Math.random()*50),t:0,life:2.2+Math.random()*1.6,w:2+Math.random()*4,col,ph:Math.random()*6})}
+function burst(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=80+Math.random()*220;P.push({k:'s',x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,t:0,life:.9+Math.random()*.7,w:3+Math.random()*4,col})}}
+function fx(dt,run){
+  if(run){for(let i=P.length-1;i>=0;i--){const p=P[i];p.t+=dt;if(p.t<0)continue;
+    if(p.k==='s'){p.vy+=380*dt;p.vx*=.99}
+    p.x+=p.vx*dt+((p.k==='n'||p.k==='m')?Math.sin(p.t*2+p.ph)*.7:0);p.y+=p.vy*dt;
+    if(p.t>p.life||p.y>1150||p.y<-80)P.splice(i,1)}
+    if(P.length>600)P.splice(0,P.length-600)}
+  gx.clearRect(0,0,1990,1080);
+  for(const p of P){
+    if(p.t<0)continue;
+    if(p.k==='r'){const u=p.t/p.life;gx.globalAlpha=(1-u)*.8;gx.strokeStyle=p.col;gx.lineWidth=4*(1-u)+1;gx.beginPath();gx.arc(p.x,p.y,18+u*150,0,6.3);gx.stroke()}
+    else if(p.k==='n'){gx.globalAlpha=clamp((p.life-p.t)/.9)*clamp(p.t/.3);gx.fillStyle=p.col;gx.font='56px serif';gx.fillText(p.ch,p.x,p.y)}
+    else{const a=clamp((p.life-p.t)/p.life);gx.globalAlpha=a*(p.k==='m'?.85:1);gx.fillStyle=p.col;gx.shadowColor=p.col;gx.shadowBlur=p.k==='m'?12:6;gx.beginPath();gx.arc(p.x,p.y,p.w,0,6.3);gx.fill();gx.shadowBlur=0}
+  }
+  gx.globalAlpha=1;
+}
+
+/* ================= TEXTO QUE SE ESCRIBE ================= */
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function typeText(name,text,k){box.classList.add('show');who.textContent=name;const n=Math.floor(text.length*clamp(k));txt.innerHTML=esc(text.slice(0,n))+(n<text.length?'<i></i>':'');return n}
+
+/* ================= MÁQUINA DE ESTADOS ================= */
+// idle -> A (voz del Centurión) -> C (elegir) <-> V (video en reproducción)
+let S='idle',paused=false,cur=null,em=0;
+function begin(){
+  startEl.style.display='none';$('bar').style.display='flex';audioInit();if(ac&&ac.state==='suspended')ac.resume();
+  S='A';aT=0;aOn=true;try{au.currentTime=0}catch(e){}const p=au.play();if(p&&p.catch)p.catch(()=>{au.bad=true});
+}
+function enableChoice(){
+  S='C';cur=null;hint.classList.add('on');
+  for(const k in V){V[k].pan.classList.add('pick');V[k].pan.classList.remove('lit')}
+}
+function playVideo(k){
+  if(S!=='C'||paused)return;
+  const o=k==='S'?'B':'S',v=V[k];
+  cur=k;S='V';hint.classList.remove('on');
+  for(const j in V){V[j].pan.classList.remove('pick','hov');if(j!==k){try{V[j].el.pause()}catch(e){}}}
+  v.pan.classList.add('lit');v.t=0;v.on=true;
+  try{v.el.currentTime=0}catch(e){}
+  const p=v.el.play();if(p&&p.catch)p.catch(()=>{v.bad=true});
+  if(k==='S'){pad(.08);bell(523.25,.16)}else{clink(.14);murmur(.07)}
+  const r=v.pan.getBoundingClientRect();
+}
+function vEnd(k){
+  if(S!=='V'||cur!==k)return;
+  const v=V[k];v.on=false;v.seen=true;v.pan.classList.remove('lit');v.pan.classList.add('seen');
+  typeText(K[k].quien,K[k].texto,1);
+  enableChoice();
+  if(V.S.seen&&V.B.seen){hint.textContent='✦ Puedes volver a cualquiera ✦';document.documentElement.classList.add('escena-lista')}
+}
+function tick(dt){
+  if(aOn&&!aok())aT+=dt;
+  if(S==='A'){
+    typeText(WHO,T0,(aTime()/aDur()-.03)/.88);
+    if(aDone()){typeText(WHO,T0,1);aOn=false;enableChoice()}
+  }else if(S==='V'){
+    const v=V[cur];
+    if(!vok(cur)&&v.on)v.t+=dt;
+    typeText(K[cur].quien,K[cur].texto,(vTime(cur)/vDur(cur)-.04)/.75);
+    if(!vok(cur)&&v.t>=DUR_V)vEnd(cur);
+    // ambiente mientras se reproduce
+    em+=dt;
+    if(em>.12){em=0;
+      if(cur==='S'){mote(30+Math.random()*935,-10,'#ffe9a8',false);P[P.length-1].vy=40+Math.random()*50;if(Math.random()<.25)mote(300+Math.random()*400,1080,'#fff2c4',true)}
+      else{mote(995+60+Math.random()*880,1090,Math.random()<.5?'#ffb35c':'#ff7a8a',true);if(Math.random()<.18)notes(1100+Math.random()*700,900,1,'#ffd9a0')}
+    }
+  }else if(S==='C'){
+    em+=dt;if(em>.35){em=0;const k=Math.random()<.5?'S':'B';if(V[k].pan.classList.contains('hov')||Math.random()<.35){const l=k==='S'?30:1025;mote(l+Math.random()*935,1080,k==='S'?'#ffe9a8':'#ffb35c',true)}}
+  }
+}
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(!paused)tick(dt);
+  fx(dt,!paused);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ================= INTERACTIVIDAD ================= */
+function pos(e){const r=stage.getBoundingClientRect(),sc=r.width/1990;return[(e.clientX-r.left)/sc,(e.clientY-r.top)/sc]}
+for(const k in V){
+  const pan=V[k].pan;
+  pan.addEventListener('pointerenter',()=>{if(S!=='C'||paused)return;pan.classList.add('hov');if(!pan._h||performance.now()-pan._h>900){pan._h=performance.now();k==='S'?bell(659.25,.1):clink(.07)}});
+  pan.addEventListener('pointerleave',()=>pan.classList.remove('hov'));
+  pan.addEventListener('focus',()=>{if(S==='C')pan.classList.add('hov')});
+  pan.addEventListener('blur',()=>pan.classList.remove('hov'));
+  pan.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();playVideo(k)}});
+  pan.addEventListener('click',()=>playVideo(k));
+}
+let lastTrail=0;
+stage.addEventListener('pointermove',e=>{
+  if(paused||S==='idle')return;const now=performance.now();if(now-lastTrail<45)return;lastTrail=now;
+  const [x,y]=pos(e);mote(x,y,x<995?'#ffe9a8':'#ffb35c',false);
+});
+stage.addEventListener('pointerdown',e=>{
+  if(ac&&ac.state==='suspended'&&!paused)ac.resume();
+  if(paused||S==='idle'||e.target.closest('button'))return;
+  const [x,y]=pos(e),left=x<995,col=left?'#ffe9a8':'#ffb35c';
+  ripple(x,y,col);
+  if(left){bell([523.25,587.33,659.25,783.99,880][Math.random()*5|0],.12);burst(x,y,'#fff2c4',10);notes(x,y,2,'#f6ecd2')}
+  else{clink(.09);burst(x,y,Math.random()<.5?'#ffb35c':'#ff7a8a',14);notes(x,y,2,'#ffd9a0')}
+});
+bPause.onclick=()=>{
+  paused=!paused;stage.classList.toggle('paused',paused);
+  if(paused){au._was=!au.paused&&!au.ended;if(au._was)au.pause();for(const k in V){const v=V[k].el;v._was=!v.paused&&!v.ended;if(v._was)v.pause()}}
+  else{if(au._was){au._was=false;const p=au.play();p&&p.catch&&p.catch(()=>{})}for(const k in V){const v=V[k].el;if(v._was){v._was=false;const p=v.play();p&&p.catch&&p.catch(()=>{})}}}
+  if(ac){paused?ac.suspend():ac.resume()}
+  bPause.textContent=paused?'▶ Seguir':'⏸ Pausa';
+};
+
+/* ================= ARRANQUE AUTOMÁTICO ================= */
+goBtn.onclick=begin;
+addEventListener('load',()=>{
+  const p=au.play();
+  if(p&&p.then){p.then(()=>{au.pause();begin()}).catch(()=>{goBtn.style.display='block'})}
+  else goBtn.style.display='block';
+});
+</script>
+</body>
+</html>

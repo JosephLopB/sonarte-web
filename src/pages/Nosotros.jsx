@@ -14,11 +14,36 @@ const bloques = [
   { fondo: "bg-marron", barra: "bg-salmon" },
 ];
 
-/** Paleta de la tarjeta personal de Yurani (YUNY): menta y rosa. */
-const yuny = {
-  menta: "#C4F7E1",
-  rosa: "#D8A0C6",
-  rosaTexto: "#B76E9B",
+/**
+ * Cada integrante conserva su lenguaje (Yurani: menta, rosa y Akira; Joseph:
+ * papel crema, terracota y Garamond), pero ambos comparten la misma retícula:
+ * retrato circular del mismo tamaño, nombre, rol, divisor, texto y firma.
+ */
+const LOOKS = {
+  Joseph: {
+    fondo: "var(--color-crema)",
+    borde: "color-mix(in oklab, var(--color-marron) 22%, transparent)",
+    nombre: "font-serif font-semibold text-marron",
+    rol: "text-terracota",
+    divisor: "bg-terracota",
+    firma: "text-terracota/90",
+    anillo: "var(--color-terracota)",
+    sello: "bg-terracota text-crema",
+    motivo: "espiral",
+    retrato: "50% 8%",
+  },
+  Yurani: {
+    fondo: "#C4F7E1",
+    borde: "var(--color-marron)",
+    nombre: "font-impacto text-marron",
+    rol: "text-[#8E3F6B]",
+    divisor: "bg-[#D8A0C6]",
+    firma: "text-[#8E3F6B]",
+    anillo: "#D8A0C6",
+    sello: "bg-[#D8A0C6] text-marron",
+    motivo: "estrella",
+    retrato: "38% 22%",
+  },
 };
 
 /** Card de integrante con tilt 3D según el cursor (GSAP). */
@@ -26,7 +51,8 @@ function CardIntegrante({ p }) {
   const card = useRef(null);
   const img = useRef(null);
   const cuerpo = useRef(null);
-  const tarjeta = p.estilo === "tarjeta";
+  const look = LOOKS[p.nombre] ?? LOOKS.Joseph;
+  const Estrella = look.motivo === "estrella";
 
   useEffect(() => {
     if (prefiereMenosMovimiento()) return;
@@ -59,66 +85,67 @@ function CardIntegrante({ p }) {
     };
   }, []);
 
-  if (tarjeta) {
-    return (
-      <div
-        ref={card}
-        className="group relative flex h-full flex-col items-center overflow-hidden rounded-[1.75rem] border-2 border-marron p-7 text-center sombra-suave"
-        style={{ backgroundColor: yuny.menta, transformStyle: "preserve-3d", perspective: 900 }}
+  return (
+    <article
+      ref={card}
+      className="group relative flex h-full flex-col items-center overflow-hidden rounded-[2rem] border-2 p-6 text-center sombra-suave sm:p-7"
+      style={{
+        backgroundColor: look.fondo,
+        borderColor: look.borde,
+        transformStyle: "preserve-3d",
+        perspective: 900,
+      }}
+    >
+      {/* Motivo de identidad: estrella para Yurani, espiral para Joseph. */}
+      <span
+        className="pointer-events-none absolute -right-10 -top-10 opacity-[0.13]"
+        aria-hidden="true"
       >
+        {Estrella ? (
+          <Star className="size-40" style={{ fill: look.anillo, color: look.anillo }} />
+        ) : (
+          <Espiral className="size-40" style={{ color: "var(--color-turquesa-medio)" }} />
+        )}
+      </span>
+
+      <div className="relative shrink-0">
         <img
           ref={img}
           src={p.img}
           alt={`Retrato de ${p.nombre}, equipo SonArte`}
-          width="768"
-          height="768"
+          width="480"
+          height="480"
           loading="lazy"
-          className="size-36 shrink-0 rounded-full border-[6px] bg-crema object-cover sombra-suave"
-          style={{ borderColor: yuny.rosa }}
+          className="size-40 rounded-full border-4 bg-crema object-cover"
+          style={{ borderColor: look.anillo, objectPosition: look.retrato }}
         />
-        <div ref={cuerpo} className="flex w-full flex-1 flex-col items-center">
-          <h3 className="mt-6 font-impacto text-3xl leading-none tracking-wide text-marron">
-            {p.nombre}
-          </h3>
-          <p className="mt-2 font-marca text-2xl leading-tight" style={{ color: yuny.rosaTexto }}>
-            {p.rol}
-          </p>
-          <span
-            className="mt-5 h-px w-24 shrink-0 rounded-full"
-            style={{ backgroundColor: yuny.rosa }}
-            aria-hidden="true"
-          />
-          <span className="mt-5 flex items-center justify-center gap-2.5" aria-hidden="true">
-            <Star className="size-4" style={{ fill: yuny.rosa, color: "#552714" }} />
-            <Star className="size-4" style={{ fill: yuny.rosa, color: "#552714" }} />
-          </span>
-          <p className="mt-3 text-sm leading-relaxed text-marron/85">{p.texto}</p>
-        </div>
+        <span
+          className={`absolute -bottom-1 -right-1 grid size-10 place-items-center rounded-full border-2 transition-transform duration-500 group-hover:rotate-12 ${look.sello}`}
+          style={{ borderColor: look.borde }}
+          aria-hidden="true"
+        >
+          {Estrella ? (
+            <Star className="size-5" style={{ fill: "currentColor" }} />
+          ) : (
+            <Espiral className="size-5" />
+          )}
+        </span>
       </div>
-    );
-  }
 
-  return (
-    <div
-      ref={card}
-      className="group relative overflow-hidden rounded-[2.25rem] bg-crema/90 p-8 backdrop-blur-sm sombra-suave"
-      style={{ transformStyle: "preserve-3d", perspective: 900 }}
-    >
-      <img
-        ref={img}
-        src={p.img}
-        alt={`Retrato ilustrado de ${p.nombre}, equipo SonArte`}
-        width="768"
-        height="768"
-        loading="lazy"
-        className="mx-auto w-44 rounded-full bg-turquesa/20 object-cover"
-      />
-      <div ref={cuerpo}>
-        <h3 className="mt-7 text-center font-serif text-3xl text-marron">{p.nombre}</h3>
-        <p className="mt-1 text-center text-xs font-semibold uppercase tracking-[0.2em] text-terracota">{p.rol}</p>
-        <p className="mt-4 text-center text-sm leading-relaxed text-muted-foreground">{p.texto}</p>
+      <div ref={cuerpo} className="relative flex w-full flex-1 flex-col items-center">
+        <h3 className={`mt-5 text-[2rem] leading-none ${look.nombre}`}>{p.nombre}</h3>
+        <p
+          className={`mt-3 flex min-h-10 items-center justify-center text-xs font-semibold uppercase leading-snug tracking-[0.16em] ${look.rol}`}
+        >
+          {p.rol}
+        </p>
+        <span className={`mt-4 h-[3px] w-16 shrink-0 rounded-full ${look.divisor}`} aria-hidden="true" />
+        <p className="mt-4 flex-1 text-[15px] leading-relaxed text-marron/80">{p.texto}</p>
+        <p className={`mt-5 font-marca text-2xl leading-none ${look.firma}`} aria-hidden="true">
+          {p.nombre}
+        </p>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -232,7 +259,7 @@ export default function Nosotros() {
         </Reveal>
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {EQUIPO.map((p, i) => (
-            <Reveal key={p.nombre} dir="up" delay={i * 0.12}>
+            <Reveal key={p.nombre} dir="up" delay={i * 0.12} className="h-full">
               <CardIntegrante p={p} />
             </Reveal>
           ))}

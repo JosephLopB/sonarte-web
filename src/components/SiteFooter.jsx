@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Espiral } from "./Espirales.jsx";
 import { MARCA } from "../data/marca.js";
+import { CONTACTO } from "../data/sitio.js";
 import { asset } from "../lib/asset.js";
 
 export function SiteFooter() {
@@ -8,11 +8,21 @@ export function SiteFooter() {
     <footer className="superficie-profunda text-crema">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <div className="flex items-center gap-3">
-            <Espiral className="size-9 text-turquesa anim-girar-lento" />
-            <span className="font-marca text-3xl">SonArte</span>
-          </div>
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-crema/75">
+          <Link
+            to="/"
+            aria-label="SonArte — Inicio"
+            className="inline-flex w-44 rounded-2xl bg-crema p-3 shadow-[0_10px_28px_-16px_oklch(0.08_0.02_42/0.9)] transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquesa"
+          >
+            <img
+              src={asset("/img/logo-full.png")}
+              alt="SonArte"
+              width="945"
+              height="540"
+              loading="lazy"
+              className="h-auto w-full"
+            />
+          </Link>
+          <p className="mt-5 max-w-xs text-sm leading-relaxed text-crema/75">
             Editorial web multimedia del Caribe colombiano. El folclore vuelve a sonar, dibujado.
           </p>
         </div>
@@ -32,9 +42,9 @@ export function SiteFooter() {
           <h3 className="font-serif text-lg">El proyecto</h3>
           <ul className="mt-4 space-y-2 text-sm text-crema/80">
             <li>
-              <a className="transition-colors hover:text-turquesa" href={MARCA.comicUrl} target="_blank" rel="noreferrer">
-                Cómic interactivo ↗
-              </a>
+              <Link className="transition-colors hover:text-turquesa" to="/comic/experiencia">
+                Cómic interactivo
+              </Link>
             </li>
             <li>
               <a className="transition-colors hover:text-turquesa" href={MARCA.revistaUrl} target="_blank" rel="noreferrer">
@@ -60,10 +70,17 @@ export function SiteFooter() {
             SonArte nace del cruce entre la ilustración y la música tropical: un espiral que crece,
             gira y vuelve siempre a su raíz.
           </p>
+          <a
+            href={`mailto:${CONTACTO.correo}`}
+            className="mt-4 inline-block break-all text-sm font-semibold text-turquesa transition-colors hover:text-crema"
+          >
+            {CONTACTO.correo}
+          </a>
         </div>
       </div>
 
-      <div className="border-t border-crema/15 py-5 text-center text-xs tracking-[0.2em] text-crema/60 uppercase">
+      {/* En móvil se reserva altura para que la burbuja de contacto no tape el aviso. */}
+      <div className="border-t border-crema/15 pt-5 pb-24 text-center text-xs tracking-[0.2em] text-crema/60 uppercase md:pb-5">
         SonArte · Proyecto transmedia · {new Date().getFullYear()}
       </div>
     </footer>

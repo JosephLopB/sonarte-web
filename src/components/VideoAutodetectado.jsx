@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { Placeholder } from "./Placeholder.jsx";
 
-/**
- * Reproduce un video de /public/media si el archivo ya existe;
- * mientras falta, muestra un placeholder con la ruta esperada.
- * Así basta con pegar el archivo para que aparezca, sin tocar código.
- */
 export function VideoAutodetectado({ ruta, titulo, nota, poster }) {
   const [estado, setEstado] = useState("comprobando");
 

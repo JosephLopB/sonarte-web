@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Escena 2 – SonArte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Lato',Calibri,sans-serif}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:#000;overflow:hidden;user-select:none}
+.scene{position:absolute;inset:0;overflow:hidden}
+#s2{transform:translateX(1920px);transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.box{position:absolute;left:30px;right:30px;bottom:0;height:330px;padding:44px 52px;background:rgba(143,143,130,.95);opacity:0;transform:translateY(40px);transition:.5s}
+.box.show{opacity:1;transform:none}
+.who{font-weight:900;font-size:50px;color:#6b2e14;margin-bottom:16px}
+.txt{font-weight:900;font-size:41px;line-height:1.3;color:#0a0a0a;min-height:110px}
+.txt i{display:inline-block;width:3px;height:.9em;background:#0a0a0a;margin-left:3px;vertical-align:-4px;animation:b .7s steps(1) infinite}
+@keyframes b{50%{opacity:0}}
+.btn{font:900 38px Lato,sans-serif;border:3px solid #6b2e14;background:rgba(143,143,130,.95);color:#2a1006;padding:18px 50px;cursor:pointer;border-radius:4px}
+.btn:hover,.btn:focus-visible{background:#f0e4c8;outline:none}
+/* botón de pausa */
+#bPause{position:absolute;top:24px;right:30px;z-index:10;font-size:26px;padding:10px 22px;display:none}
+/* flecha para jalar */
+#pull{position:absolute;right:110px;top:380px;width:560px;height:130px;border-radius:65px;background:rgba(143,143,130,.85);border:3px solid #6b2e14;display:none;z-index:8;align-items:center;justify-content:flex-end;padding-right:50px;font-weight:900;font-size:34px;color:#2a1006}
+#handle{position:absolute;left:8px;top:8px;width:108px;height:108px;border-radius:50%;background:#6b2e14;color:#f0e4c8;font-size:64px;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;animation:nudge 1.4s ease-in-out infinite}
+#handle.drag{cursor:grabbing;animation:none}
+@keyframes nudge{50%{transform:translateX(26px)}}
+#start{position:absolute;inset:0;z-index:20;background:#000;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ESCENA 1 -->
+  <div class="scene" id="s1">
+    <video id="v1" playsinline preload="auto"></video>
+    <div class="box" id="b1"><div class="who"></div><div class="txt"></div></div>
+  </div>
+
+  <!-- ESCENA 2 -->
+  <div class="scene" id="s2">
+    <video id="v2" playsinline preload="auto"></video>
+    <div class="box" id="b2"><div class="who"></div><div class="txt"></div></div>
+  </div>
+
+  <!-- Botón de pausa -->
+  <button class="btn" id="bPause">⏸ Pausa</button>
+
+  <!-- Flecha para jalar el siguiente video -->
+  <div id="pull"><div id="handle">➜</div><span>Jala la flecha</span></div>
+
+  <!-- Pantalla negra de carga (el botón solo aparece si el navegador bloquea el sonido) -->
+  <div id="start"><button class="btn" id="go" style="display:none">▶ Comenzar</button></div>
+</div>
+
+<audio id="a1" preload="auto"></audio>
+<audio id="a2" preload="auto"></audio>
+
+<script>
+const $=id=>document.getElementById(id);
+const stage=$('stage'),v1=$('v1'),v2=$('v2'),a1=$('a1'),a2=$('a2'),s2=$('s2'),pull=$('pull'),handle=$('handle'),bPause=$('bPause');
+
+/* ====== NOMBRES DE TUS ARCHIVOS (deben estar en la misma carpeta que index.html) ====== */
+const FILES={v1:'radio vigia.mp4', v2:'Bus.mp4', a1:'son1.mp3', a2:'son2.mp3'};
+const BG_VOL=0.35;            // volumen del sonido de los videos (0 a 1) para que se escuche la voz
+
+const els={v1,v2,a1,a2};
+for(const k in els){
+  els[k].src=encodeURI(FILES[k]);
+  els[k].addEventListener('error',()=>{els[k].bad=true;warn(FILES[k])});
+}
+function warn(name){
+  let w=$('warn');
+  if(!w){w=document.createElement('div');w.id='warn';w.style.cssText='position:absolute;left:30px;top:20px;z-index:50;background:#b11917;color:#fff;font:700 28px Lato,sans-serif;padding:14px 24px;border-radius:6px;max-width:1500px';stage.appendChild(w)}
+  w.innerHTML+='No se pudo cargar "'+name+'". Revisa que esté en la misma carpeta que index.html y que se llame exactamente igual.<br>';
+}
+v1.volume=BG_VOL;v2.volume=BG_VOL;
+let scale=1;
+function fit(){scale=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1920*scale)/2}px,${(innerHeight-1080*scale)/2}px) scale(${scale})`}
+addEventListener('resize',fit);fit();
+
+/* ====== TEXTOS ====== */
+const T1='Esa voz no se quedó guardada mucho tiempo. Llegó hasta Radio Vigía, donde el músico Manuel Villanueva la escuchó por casualidad... y supo enseguida que tenía que llevársela a su orquesta.';
+// Escena 2: t0 / t1 = segundo del video en que empieza y termina de escribirse cada línea
+const S2=[
+ {who:'Manuel',        text:'Vente conmigo a Barranquilla, Joe. Grabemos algo que nadie haya escuchado antes.', t0:.8,  t1:6},
+ {who:'Joe',           text:'¿Me deja ir, ma\'?',                                                              t0:7,   t1:8.6},
+ {who:'Mamá de Joe',   text:'Vaya, mi\'jo. Pero no se le olvide de dónde salió esa voz.',                       t0:10,  t1:15},
+ {who:'El Centurión',  text:'Y así, Cartagena quedó atrás. Barranquilla estaba a punto de conocer al verdadero Joe Arroyo.', t0:19.2, t1:25.4}
+];
+const AUDIO2_AT=19;           // segundo del video en que suena el segundo audio
+
+function paint(box,who,text,k){
+  box.classList.add('show');
+  box.querySelector('.who').textContent=who;
+  const n=Math.floor(text.length*Math.max(0,Math.min(1,k)));
+  box.querySelector('.txt').innerHTML=text.slice(0,n).replace(/</g,'&lt;')+(n<text.length?'<i></i>':'');
+}
+const ok=m=>!m.bad&&m.duration>0;                 // el archivo cargó bien
+const go=m=>{const p=m.play();if(p&&p.catch)p.catch(()=>{})};
+
+/* ====== ESCENA 1 ====== */
+let mode=0,raf=0,a2started=false,start=0;
+function scene1(){
+  mode=1;start=performance.now();bPause.style.display='block';
+  v1.currentTime=0;a1.currentTime=0;go(v1);go(a1);loop();
+}
+/* ====== BUCLE ====== */
+function loop(){
+  const now=performance.now();
+  if(mode===1){
+    // progreso: manda el audio; si no cargó, el video; si tampoco, un reloj de 11 s
+    const m=ok(a1)?a1:(ok(v1)?v1:null);
+    const p=m?m.currentTime/m.duration:(now-start)/11000;
+    paint($('b1'),'El Centurión',T1,(p-.02)/.9);
+    const fin=(!ok(a1)||a1.ended)&&(!ok(v1)||v1.ended)&&p>=.97;
+    if(fin){mode=0;paint($('b1'),'El Centurión',T1,1);pull.style.display='flex';return}
+  }else if(mode===2){
+    const t=ok(v2)?v2.currentTime:(now-start)/1000;
+    let seg=null;for(const s of S2)if(t>=s.t0)seg=s;
+    if(seg)paint($('b2'),seg.who,seg.text,(t-seg.t0)/(seg.t1-seg.t0));
+    if(!a2started&&t>=AUDIO2_AT){a2started=true;go(a2)}
+    if(ok(v2)?v2.ended:t>=30.3){
+      // fin: se queda la última imagen con el texto completo del Centurión
+      mode=0;const l=S2[S2.length-1];paint($('b2'),l.who,l.text,1);return;
+    }
+  }
+  if(mode)raf=requestAnimationFrame(loop);
+}
+/* ====== ESCENA 2 ====== */
+v2.addEventListener('loadeddata',()=>{v2.currentTime=.01});
+function scene2(){
+  mode=2;start=performance.now();pull.style.display='none';v1.pause();
+  v2.currentTime=0;go(v2);loop();
+}
+/* ====== PAUSA ====== */
+let paused=false,wasPlaying=[],pausedAt=0;
+bPause.onclick=()=>{
+  const all=[v1,a1,v2,a2];
+  if(!paused){
+    paused=true;pausedAt=performance.now();
+    wasPlaying=all.filter(m=>!m.paused&&!m.ended);
+    wasPlaying.forEach(m=>m.pause());
+    bPause.textContent='▶ Seguir';
+  }else{
+    paused=false;start+=performance.now()-pausedAt;   // el reloj de respaldo no avanza durante la pausa
+    wasPlaying.forEach(go);wasPlaying=[];
+    bPause.textContent='⏸ Pausa';
+  }
+};
+/* ====== FLECHA: jalar el video 2 ====== */
+const TRAVEL=410;let sx=0,dragging=false;
+function setReveal(r){handle.style.transform=`translateX(${r*TRAVEL}px)`;s2.style.transition='none';s2.style.transform=`translateX(${(1-r)*1920}px)`}
+handle.addEventListener('pointerdown',e=>{dragging=true;sx=e.clientX;handle.setPointerCapture(e.pointerId);handle.classList.add('drag')});
+handle.addEventListener('pointermove',e=>{if(!dragging)return;setReveal(Math.max(0,Math.min(1,(e.clientX-sx)/scale/TRAVEL)))});
+function release(e){
+  if(!dragging)return;dragging=false;handle.classList.remove('drag');
+  const r=Math.max(0,Math.min(1,(e.clientX-sx)/scale/TRAVEL));
+  s2.style.transition='transform .55s cubic-bezier(.3,.7,.2,1)';
+  if(r>.45){s2.style.transform='translateX(0)';handle.style.display='none';setTimeout(scene2,560)}
+  else{s2.style.transform='translateX(1920px)';handle.style.transform='';}
+}
+handle.addEventListener('pointerup',release);handle.addEventListener('pointercancel',release);
+handle.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){setReveal(1);release({clientX:sx+TRAVEL*scale+1})}});
+handle.tabIndex=0;
+
+/* ====== ARRANQUE AUTOMÁTICO ====== */
+$('go').onclick=()=>{$('start').style.display='none';scene1()};
+addEventListener('load',()=>{
+  const p=a1.play();
+  if(p&&p.then){
+    p.then(()=>{$('start').style.display='none';scene1()})
+     .catch(()=>{$('go').style.display='block'});   // el navegador bloqueó el sonido: pide un clic
+  }else{$('start').style.display='none';scene1()}
+});
+</script>
+</body>
+</html>

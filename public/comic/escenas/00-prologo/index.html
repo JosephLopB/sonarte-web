@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Escena 1 – SonArte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#000;overflow:hidden;font-family:'Lato',Calibri,sans-serif}
+#stage{position:absolute;left:0;top:0;width:1990px;height:1080px;transform-origin:0 0;background:#000;overflow:hidden;user-select:none}
+#fondo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#luz{position:absolute;left:50%;bottom:-35%;width:45%;transform:translateX(-50%);opacity:0;z-index:1;pointer-events:none;mix-blend-mode:screen}
+#luz.activa{animation:subirLuz 1.6s ease-out forwards}
+@keyframes subirLuz{0%{bottom:-35%;opacity:0}25%{opacity:1}100%{bottom:20%;opacity:1}}
+#sombra{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .4s ease-in}
+#sombra.activa{opacity:1}
+#sombra.brillo{--c:255,222,140;animation:brillo 1.8s ease-in-out infinite}
+@keyframes brillo{0%,100%{filter:drop-shadow(0 0 3px rgba(var(--c),.3)) drop-shadow(0 0 10px rgba(var(--c),.2))}50%{filter:drop-shadow(0 0 8px rgba(var(--c),.95)) drop-shadow(0 0 26px rgba(var(--c),.7))}}
+#joe{position:absolute;top:140px;left:50%;transform:translate(-50%,0);width:28%;height:auto;z-index:2;pointer-events:none;display:none}
+#publico,#publico2,#publico3{position:absolute;left:50%;transform:translateX(-50%);width:100%;height:100%;pointer-events:none;display:none}
+#publico{top:218px;z-index:4}#publico2{top:290px;z-index:5}#publico3{top:362px;z-index:6}   /* cada capa un poco más abajo */
+#telon{position:absolute;inset:0;width:100%;height:100%;z-index:3;transform:translateY(-31px)}
+#negro{position:absolute;inset:0;z-index:7;background:#000;opacity:0;pointer-events:none;transition:opacity 1.5s ease}
+#negro.activo{opacity:1}
+#fx{position:absolute;inset:0;width:100%;height:100%;z-index:6;pointer-events:none}
+#hint{position:absolute;top:120px;left:0;right:0;text-align:center;z-index:6;font-weight:900;font-size:40px;color:#f6ecd2;text-shadow:0 3px 16px #000;opacity:0;transition:opacity 1s;pointer-events:none;letter-spacing:2px}
+#hint.on{opacity:1;animation:hb 2.2s ease-in-out infinite}
+@keyframes hb{50%{opacity:.45}}
+.box{position:absolute;left:30px;right:30px;bottom:0;height:300px;padding:40px 52px;background:rgba(143,143,130,.95);opacity:0;transform:translateY(40px);transition:opacity .45s,transform .45s;z-index:8;pointer-events:none}
+.box.show{opacity:1;transform:none}
+.who{font-weight:900;font-size:50px;color:#6b2e14;margin-bottom:14px}
+.txt{font-weight:900;font-size:41px;line-height:1.3;color:#0a0a0a;min-height:110px;transition:opacity .35s}
+.box.cambiando .txt,.box.cambiando .who{opacity:0}
+.txt i{display:inline-block;width:3px;height:.9em;background:#0a0a0a;margin-left:3px;vertical-align:-4px;animation:b .7s steps(1) infinite}
+@keyframes b{50%{opacity:0}}
+.btn{font:900 26px Lato,sans-serif;border:3px solid #6b2e14;background:rgba(143,143,130,.95);color:#2a1006;padding:10px 22px;cursor:pointer;border-radius:4px}
+.btn:hover,.btn:focus-visible{background:#f0e4c8;outline:none}
+.bar{position:absolute;top:24px;right:30px;display:none;gap:12px;z-index:9}
+#start{position:absolute;inset:0;z-index:20;background:#000;display:flex;align-items:center;justify-content:center}
+#stage.paused *{animation-play-state:paused!important}
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="fondo" src="img/Fondo.png" alt="">
+  <img id="luz" src="img/luz.png" alt="">
+  <div id="sombra"></div>
+  <div id="joe"></div>
+  <div id="publico"></div>
+  <div id="publico2"></div>
+  <div id="publico3"></div>
+  <div id="telon"></div>
+  <div id="negro"></div>
+  <canvas id="fx" width="1990" height="1080"></canvas>
+  <div id="hint"></div>
+  <div class="box" id="box"><div class="who" id="who"></div><div class="txt" id="txt"></div></div>
+  <div class="bar" id="bar"><button class="btn" id="bPause">⏸ Pausa</button></div>
+  <div id="start"><button class="btn" id="go" style="font-size:38px;padding:20px 50px">Haz clic para empezar la experiencia</button></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+<script>window.lottie||document.write('<script src="lottie.min.js"><\/script>')</script>
+<script>
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const stage=$('stage'),box=$('box'),who=$('who'),txt=$('txt'),cv=$('fx'),gx=cv.getContext('2d'),hint=$('hint'),
+      bPause=$('bPause'),startEl=$('start'),negro=$('negro'),luz=$('luz'),sombraEl=$('sombra'),joeEl=$('joe'),publicoEl=$('publico'),publicoEl2=$('publico2'),publicoEl3=$('publico3');
+
+/* ================= CONFIGURACIÓN ================= */
+const CFG={
+  audio:{sombra:'son1.mp3',joe:'son2.mp3',final:'son3.mp3'},
+  cancion:'Rebelion.mp3',volCancion:.3,   // Rebelión empieza cuando aparece Joe (volumen 0 a 1)
+  json:{telon:'json/telon.json',sombra:'json/sombra.json',joe:'json/joeAni.json',publico:'json/publico1.json',publico2:'json/publico2.json',publico3:'json/publico3.json'},
+  velocidad:45,                      // ms por letra
+  pausaLecturaJoe:1000, pausaNegro:1800,
+  quien:{sombra:'La Sombra',joe:'El Centurión',final:'El Centurión'}
+};
+const TEXTO_SOMBRA='Yo soy la sombra que guarda el ritmo. Y esto que estás por ver no es solo una historia... es la anatomía de un trueno.';
+const TEXTO_JOE='Esta es la historia de Joe. La de un grito que salió de un barrio y terminó siendo el grito de todo un país.';
+const TEXTO_FINAL='Pero para entender este trueno, hay que volver al principio. Hay que volver a una calle en Cartagena, muchos años antes de esta noche.';
+
+/* ================= ESCALA Y AVISOS ================= */
+function fit(){const s=Math.min(innerWidth/1990,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1990*s)/2}px,${(innerHeight-1080*s)/2}px) scale(${s})`}
+addEventListener('resize',fit);fit();
+function warn(msg){
+  let w=$('warn');
+  if(!w){w=document.createElement('div');w.id='warn';w.style.cssText='position:absolute;left:30px;top:20px;z-index:50;background:#b11917;color:#fff;font:700 26px Lato,sans-serif;padding:12px 22px;border-radius:6px;max-width:1500px';stage.appendChild(w)}
+  w.innerHTML+=msg+'<br>';clearTimeout(w._t);w._t=setTimeout(()=>w.remove(),16000);
+}
+['fondo','luz'].forEach(id=>$(id).addEventListener('error',()=>warn('No se pudo cargar "'+$(id).getAttribute('src')+'". Revisa la carpeta img.')));
+if(location.protocol==='file:')warn('Las animaciones .json no cargan con doble clic: abre la carpeta en VS Code y usa "Go Live" (Live Server).');
+
+/* ================= RELOJ PROPIO (se detiene con la pausa) ================= */
+let paused=false,clock=0;const waiters=[];
+const esperar=ms=>new Promise(r=>waiters.push({t:clock+ms,r}));
+function runClock(dt){clock+=dt*1000;for(let i=waiters.length-1;i>=0;i--)if(waiters[i].t<=clock){waiters[i].r();waiters.splice(i,1)}}
+
+/* ================= LOTTIE ================= */
+function load(container,path,name){
+  const a=lottie.loadAnimation({container,renderer:'svg',loop:false,autoplay:false,path});
+  a.addEventListener('data_failed',()=>{a.failed=true;warn('No se pudo cargar "'+path+'". Revisa la carpeta json.');});
+  return a;
+}
+const telonAnim=load($('telon'),CFG.json.telon,'telon');
+const sombraAnim=load(sombraEl,CFG.json.sombra);
+const joeAnim=load(joeEl,CFG.json.joe);
+const publicoAnim=load(publicoEl,CFG.json.publico);
+const publicoAnim2=load(publicoEl2,CFG.json.publico2);
+const publicoAnim3=load(publicoEl3,CFG.json.publico3);
+// si el telón no carga, la escena sigue igual (simula la duración)
+function playTelon(dir){
+  telonAnim.setDirection(dir);
+  if(telonAnim.failed){esperar(1500).then(()=>telonAnim.triggerEvent('complete'));return}
+  telonAnim.play();
+  esperar(400).then(()=>{if(telonAnim.failed)esperar(1100).then(()=>telonAnim.triggerEvent('complete'))});
+}
+
+/* ================= SONIDOS (sintetizados) ================= */
+let ac=null,sg=null,noiseBuf=null;
+function audioInit(){
+  if(ac)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  ac=new AC();sg=ac.createGain();sg.gain.value=.8;sg.connect(ac.destination);
+  const n=ac.sampleRate*2;noiseBuf=ac.createBuffer(1,n,ac.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+}
+function partial(f,t,pk,dec,type,att){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(pk,t+(att||.008));g.gain.exponentialRampToValueAtTime(.0001,t+dec);o.connect(g);g.connect(sg);o.start(t);o.stop(t+dec+.05)}
+function bell(f,v){if(!ac)return;const t=ac.currentTime;[[1,1],[2.01,.4],[3.02,.15]].forEach(([m,a])=>partial(f*m,t,(v||.15)*a,2.4))}
+function swoosh(dur,f0,f1,v){if(!ac)return;const t=ac.currentTime,s=ac.createBufferSource();s.buffer=noiseBuf;const f=ac.createBiquadFilter();f.type='bandpass';f.Q.value=.8;f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);const g=ac.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v||.25,t+dur*.4);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(sg);s.start(t,Math.random(),dur+.1)}
+function drone(){if(!ac)return;const t=ac.currentTime;[65.4,98,130.8].forEach((f,i)=>partial(f,t,.07,5,'triangle',1.2))}
+function applause(dur,v){if(!ac)return;const t=ac.currentTime,s=ac.createBufferSource();s.buffer=noiseBuf;s.loop=true;const f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=1800;const g=ac.createGain();g.gain.setValueAtTime(.0001,t);for(let i=0;i<dur*10;i++)g.gain.linearRampToValueAtTime((v||.14)*(.4+Math.random()*.6)*clamp(i/8)*clamp((dur*10-i)/20),t+i*.1);g.gain.linearRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(sg);s.start(t);s.stop(t+dur+.1)}
+const PENT=[261.63,293.66,329.63,392,440,523.25,587.33,659.25];
+
+/* ================= PARTÍCULAS ================= */
+const P=[];
+function ripple(x,y,col){P.push({k:'r',x,y,vx:0,vy:0,t:0,life:1.2,col})}
+function mote(x,y,col,up){P.push({k:'m',x,y,vx:(Math.random()-.5)*24,vy:(up?-1:-.3)*(25+Math.random()*50),t:0,life:2+Math.random()*1.6,w:2+Math.random()*4,col,ph:Math.random()*6})}
+function burst(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*6.28,s=80+Math.random()*220;P.push({k:'s',x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-60,t:0,life:.9+Math.random()*.7,w:3+Math.random()*4,col})}}
+function notes(x,y,n,col){for(let i=0;i<n;i++)P.push({k:'n',x:x+(Math.random()-.5)*80,y,vx:(Math.random()-.5)*30,vy:-70-Math.random()*60,t:-i*.15,life:3.2,ch:['♪','♫','♬'][Math.random()*3|0],ph:Math.random()*6,col})}
+function fx(dt){
+  if(!paused){for(let i=P.length-1;i>=0;i--){const p=P[i];p.t+=dt;if(p.t<0)continue;if(p.k==='s'){p.vy+=380*dt;p.vx*=.99}p.x+=p.vx*dt+((p.k==='n'||p.k==='m')?Math.sin(p.t*2+p.ph)*.7:0);p.y+=p.vy*dt;if(p.t>p.life||p.y>1150||p.y<-80)P.splice(i,1)}if(P.length>500)P.splice(0,P.length-500)}
+  gx.clearRect(0,0,1990,1080);
+  for(const p of P){if(p.t<0)continue;
+    if(p.k==='r'){const u=p.t/p.life;gx.globalAlpha=(1-u)*.8;gx.strokeStyle=p.col;gx.lineWidth=4*(1-u)+1;gx.beginPath();gx.arc(p.x,p.y,18+u*150,0,6.3);gx.stroke()}
+    else if(p.k==='n'){gx.globalAlpha=clamp((p.life-p.t)/.9)*clamp(p.t/.3);gx.fillStyle=p.col;gx.font='56px serif';gx.fillText(p.ch,p.x,p.y)}
+    else{gx.globalAlpha=clamp((p.life-p.t)/p.life)*.9;gx.fillStyle=p.col;gx.shadowColor=p.col;gx.shadowBlur=10;gx.beginPath();gx.arc(p.x,p.y,p.w,0,6.3);gx.fill();gx.shadowBlur=0}}
+  gx.globalAlpha=1;
+}
+
+/* ================= VOCES ================= */
+const AUD={};
+for(const k in CFG.audio){const a=new Audio();a.preload='auto';a.src=encodeURI(CFG.audio[k]);a.addEventListener('error',()=>{a.bad=true;warn('No se pudo cargar "'+CFG.audio[k]+'". Ponlo en la misma carpeta que index.html.')});AUD[k]=a}
+const song=new Audio();song.preload='auto';song.loop=true;song.volume=0;song.src=encodeURI(CFG.cancion);
+song.addEventListener('error',()=>warn('No se pudo cargar "'+CFG.cancion+'". Ponlo en la misma carpeta que index.html.'));
+AUD.song=song;
+let songOn=false,songVol=0;
+function songStart(){songOn=true;const p=song.play();if(p&&p.catch)p.catch(()=>{})}
+const audOk=a=>a&&!a.bad&&a.duration>0;
+/* ================= CUADRO DE NARRACIÓN ================= */
+let narToken=0;
+const pausaExtra=c=>'.!?…'.includes(c)?300:',;:'.includes(c)?150:0;
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+async function narrar(nombre,texto,{retraso=0,audio=null}={}){
+  const token=++narToken,letras=Array.from(texto),ya=box.classList.contains('show');
+  if(retraso){await esperar(retraso);if(token!==narToken)return false}
+  if(ya&&!box.classList.contains('cambiando')){box.classList.add('cambiando');await esperar(400);if(token!==narToken)return false}
+  who.textContent=nombre;txt.innerHTML='';box.classList.remove('cambiando');box.classList.add('show');
+  if(!ya){await esperar(600);if(token!==narToken)return false}
+  const a=audio?AUD[audio]:null;
+  if(audOk(a)){                                   // texto sincronizado con la voz
+    try{a.currentTime=0}catch(e){}const p=a.play();if(p&&p.catch)p.catch(()=>{a.bad=true});
+    let t=0;
+    while(!a.ended&&!a.bad){
+      if(token!==narToken){a.pause();return false}
+      const n=Math.floor(letras.length*clamp((a.currentTime/a.duration-.03)/.88));
+      txt.innerHTML=esc(letras.slice(0,n).join(''))+(n<letras.length?'<i></i>':'');
+      await esperar(30);t+=30;if(t>(a.duration+3)*1000&&!a.currentTime)break;
+    }
+    if(token!==narToken)return false;
+    txt.innerHTML=esc(texto);return true;
+  }
+  for(let i=1;i<=letras.length;i++){
+    if(token!==narToken)return false;
+    txt.innerHTML=esc(letras.slice(0,i).join(''))+(i<letras.length?'<i></i>':'');
+    await esperar(CFG.velocidad+pausaExtra(letras[i-1]));
+  }
+  return true;
+}
+async function vaciar(){const token=++narToken;box.classList.add('cambiando');await esperar(400);if(token!==narToken)return;txt.innerHTML=''}
+
+/* ================= SECUENCIA ================= */
+let etapa='cerrado',listoParaCerrar=false,textoJoeListo=false,joeEnPantalla=false,finalIniciado=false;
+function setHint(t){if(t){hint.textContent=t;hint.classList.add('on')}else hint.classList.remove('on')}
+
+function abrir(){
+  etapa='abriendo';luz.classList.add('activa');swoosh(1.8,300,2400,.3);
+  playTelon(1);
+}
+function cerrar(){
+  etapa='cerrando';listoParaCerrar=false;setHint('');
+  sombraEl.classList.remove('brillo');swoosh(1.8,2400,300,.3);
+  vaciar();playTelon(-1);
+}
+telonAnim.addEventListener('complete',()=>{
+  if(etapa==='abriendo'){
+    etapa='abierto';sombraEl.classList.add('activa');sombraAnim.goToAndPlay(0,true);drone();narrarSombra();
+  }else if(etapa==='cerrando'){
+    etapa='reabriendo';sombraEl.classList.remove('activa');
+    joeEl.style.display='block';[publicoEl,publicoEl2,publicoEl3].forEach(e=>e.style.display='block');joeAnim.play();publicoAnim.play();songStart();
+    esperar(350).then(()=>publicoAnim2.play());esperar(700).then(()=>publicoAnim3.play());   // entran una tras otra
+    applause(5,.12);swoosh(1.8,300,2400,.25);playTelon(1);
+  }else if(etapa==='reabriendo'){
+    etapa='abierto2';joeEnPantalla=true;narrarJoe();
+  }
+});
+async function narrarSombra(){
+  const ok=await narrar(CFG.quien.sombra,TEXTO_SOMBRA,{retraso:800,audio:'sombra'});
+  if(!ok||etapa!=='abierto')return;
+  sombraEl.classList.add('brillo');listoParaCerrar=true;setHint('✦ Haz clic para continuar ✦');
+}
+async function narrarJoe(){
+  const ok=await narrar(CFG.quien.joe,TEXTO_JOE,{retraso:800,audio:'joe'});
+  if(!ok)return;textoJoeListo=true;revisarFinal();
+}
+function revisarFinal(){if(textoJoeListo&&joeEnPantalla&&!finalIniciado){finalIniciado=true;secuenciaFinal()}}
+async function secuenciaFinal(){
+  await esperar(CFG.pausaLecturaJoe);negro.classList.add('activo');await esperar(CFG.pausaNegro);
+  await narrar(CFG.quien.final,TEXTO_FINAL,{audio:'final'});
+  etapa='fin';setHint('');document.documentElement.classList.add('escena-lista');
+}
+
+/* ================= INICIO, REJOJ, PAUSA ================= */
+$('go').onclick=()=>{startEl.style.display='none';$('bar').style.display='flex';audioInit();if(ac&&ac.state==='suspended')ac.resume();abrir()};
+let last=performance.now();
+(function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused){runClock(dt);
+  if(songOn){songVol=Math.min(CFG.volCancion,songVol+dt*CFG.volCancion/3);song.volume=songVol}   // entra poco a poco
+  if(etapa==='abierto'&&listoParaCerrar&&Math.random()<.12)mote(760+Math.random()*470,800,'#ffe9a8',true);   // brasas junto a la sombra
+  if(etapa==='abierto2'||etapa==='fin')if(Math.random()<.1)mote(Math.random()*1990,1090,'#ffd9a0',true)}
+  fx(dt);requestAnimationFrame(frame)})(last);
+bPause.onclick=()=>{
+  paused=!paused;stage.classList.toggle('paused',paused);
+  [telonAnim,sombraAnim,joeAnim,publicoAnim,publicoAnim2,publicoAnim3].forEach(a=>{if(paused){a._was=!a.isPaused;if(a._was)a.pause()}else if(a._was){a._was=false;a.play()}});
+  for(const k in AUD){const a=AUD[k];if(paused){a._was=!a.paused&&!a.ended;if(a._was)a.pause()}else if(a._was){a._was=false;const p=a.play();p&&p.catch&&p.catch(()=>{})}}
+  if(ac)paused?ac.suspend():ac.resume();
+  bPause.textContent=paused?'▶ Seguir':'⏸ Pausa';
+};
+
+/* ================= INTERACTIVIDAD ================= */
+function pos(e){const r=stage.getBoundingClientRect(),s=r.width/1990;return[(e.clientX-r.left)/s,(e.clientY-r.top)/s]}
+let lastT=0;
+stage.addEventListener('pointermove',e=>{if(paused||etapa==='cerrado')return;const n=performance.now();if(n-lastT<45)return;lastT=n;const[x,y]=pos(e);mote(x,y,'#ffe9a8',false)});
+stage.addEventListener('pointerdown',e=>{
+  if(ac&&ac.state==='suspended'&&!paused)ac.resume();
+  if(paused||etapa==='cerrado'||e.target.closest('button'))return;
+  const[x,y]=pos(e);ripple(x,y,'#f6ecd2');burst(x,y,'#ffe9a8',10);bell(PENT[Math.random()*PENT.length|0],.12);
+  if(etapa==='abierto2'||etapa==='fin'){notes(x,y,2,'#f3e2b3');if(Math.random()<.4)applause(1.2,.08)}
+  if(etapa==='abierto'&&listoParaCerrar)cerrar();
+});
+</script>
+</body>
+</html>

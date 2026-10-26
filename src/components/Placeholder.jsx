@@ -1,9 +1,5 @@
 import { Espiral } from "./Espirales.jsx";
 
-/**
- * Hueco elegante para material pendiente: indica qué archivo se espera
- * sin romper el diseño mientras el material no se copie a /public/media.
- */
 export function Placeholder({ titulo = "Material pendiente", nota, alto = "aspect-video" }) {
   return (
     <div

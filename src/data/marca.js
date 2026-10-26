@@ -13,7 +13,7 @@ export const MARCA = {
   isotipo: asset("/marca/isotipo.png"),
   espiral: asset("/marca/espiral-hero.svg"),
   revistaUrl: "https://indd.adobe.com/view/c9583718-0fac-4d40-bb19-a8448eefdf6b",
-  comicUrl: "https://comic-centurion.lovable.app",
+  comicUrl: "/comic/experiencia",
   mision:
     "Revivir el folclore colombiano a través de un cómic digital interactivo transmedia que acerque a las nuevas generaciones a la música, las historias y la identidad del Caribe.",
   vision:
@@ -64,8 +64,8 @@ export const VALORES = [
 ];
 
 /**
- * `estilo: "tarjeta"` pinta la card con el diseño personal de Yurani
- * (fondo menta, divisorio y estrellas rosa, tomado de su tarjeta YUNY).
+ * El diseño de cada tarjeta vive en Nosotros.jsx: ambas comparten retícula y
+ * tamaños, pero conservan la paleta y la tipografía de cada integrante.
  */
 export const EQUIPO = [
   {
@@ -81,7 +81,6 @@ export const EQUIPO = [
     texto:
       "Investiga el folclore, escribe los guiones y da forma a la revista y a la voz de la marca.",
     img: asset("/img/Yura.png"),
-    estilo: "tarjeta",
   },
 ];
 

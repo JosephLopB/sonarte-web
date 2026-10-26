@@ -173,6 +173,18 @@
   }
 }
 
+@keyframes pulso-halo {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.12);
+  }
+}
+
 @keyframes deriva {
   0% {
     transform: translateX(0);
@@ -220,6 +232,10 @@
   animation: flotar 7s var(--ease-smooth) infinite;
 }
 
+@utility anim-pulso-halo {
+  animation: pulso-halo 2.4s ease-in-out infinite;
+}
+
 @utility anim-deriva {
   animation: deriva 28s linear infinite;
 }
@@ -234,6 +250,17 @@
 
 @utility anim-girar-lento {
   animation: girar-lento 40s linear infinite;
+}
+
+/* Aviso de orientación del cómic: solo móviles en vertical. */
+.aviso-girar {
+  display: none;
+}
+
+@media (orientation: portrait) and (max-width: 900px) {
+  .aviso-girar {
+    display: flex;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
