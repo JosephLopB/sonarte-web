@@ -1,5 +1,5 @@
 {
-  "generado": "2026-10-26T06:47:23.543Z",
+  "generado": "2026-10-26T07:50:38.132Z",
   "origen": "Comic",
   "archivos": [
     {
@@ -89,8 +89,8 @@
     {
       "origen": "Escena 1/index.html",
       "destino": "01-barrio/index.html",
-      "bytes": 13302,
-      "sha256": "4bf658a7e3af16cea2c85378109e2694a1ecfe714321905e06e2b71e35148c98"
+      "bytes": 13568,
+      "sha256": "d34049aa5dadac335d0aa4968a7c465dc67d04f47f6d7cd442af67278d0aeb79"
     },
     {
       "origen": "Escena 1/Escena_1.mp4",

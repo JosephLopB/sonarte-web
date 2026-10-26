@@ -11,16 +11,20 @@ export function SiteFooter() {
           <Link
             to="/"
             aria-label="SonArte — Inicio"
-            className="inline-flex w-44 rounded-2xl bg-crema p-3 shadow-[0_10px_28px_-16px_oklch(0.08_0.02_42/0.9)] transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquesa"
+            className="group inline-flex items-center gap-3.5 transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-turquesa"
           >
             <img
-              src={asset("/img/logo-full.png")}
-              alt="SonArte"
-              width="945"
-              height="540"
+              src={asset("/marca/isotipo.png")}
+              alt=""
+              aria-hidden="true"
+              width="512"
+              height="512"
               loading="lazy"
-              className="h-auto w-full"
+              className="size-16 shrink-0 rounded-[1.2rem] shadow-[0_14px_30px_-18px_oklch(0.08_0.02_42/0.85)] ring-1 ring-crema/20 transition-transform duration-500 group-hover:-rotate-3"
             />
+            <span className="font-serif text-3xl leading-none tracking-tight text-crema">
+              SonArte
+            </span>
           </Link>
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-crema/75">
             Editorial web multimedia del Caribe colombiano. El folclore vuelve a sonar, dibujado.

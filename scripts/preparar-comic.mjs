@@ -109,6 +109,16 @@ const REEMPLAZOS = {
   // experiencia cuando termina (clase `escena-lista` en <html>).
   "01-barrio/index.html": [
     ["video:'Escena_1.mp4'", "video:'barrio.mp4'"],
+    // El montaje trae casi 8 s de negro al final. Se detiene en el último
+    // cuadro visible (Joe con su frase), se retira la pausa y la burbuja se
+    // desvanece tras unos segundos de lectura.
+    ["let paused=false,started=false,em=0;", "let paused=false,started=false,em=0,fin=false;"],
+    [
+      "  const t=v.currentTime;",
+      "  const t=v.currentTime;if(!fin&&v.duration&&t>=v.duration-7.75){fin=true;try{v.pause()}catch(e){};$('bar').style.display='none';document.documentElement.classList.add('escena-lista');setTimeout(()=>{$('bub').style.transition='opacity .6s';$('bub').style.opacity='0'},5000)}",
+    ],
+    ["if(started&&!paused){", "if(started&&!paused&&!fin){"],
+    // Respaldo por si el navegador no reporta la duración.
     [
       "v.src=encodeURI(CFG.video);v.load();",
       "v.src=encodeURI(CFG.video);v.load();v.addEventListener('ended',()=>document.documentElement.classList.add('escena-lista'));",

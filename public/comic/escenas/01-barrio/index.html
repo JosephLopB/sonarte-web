@@ -120,11 +120,11 @@ const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 function type(el,text,k){const n=Math.floor(text.length*clamp(k));el.innerHTML=esc(text.slice(0,n))+(n<text.length?'<i></i>':'')}
 
 /* ================= BUCLE PRINCIPAL: todo se sincroniza con el tiempo del video ================= */
-let paused=false,started=false,em=0;
+let paused=false,started=false,em=0,fin=false;
 const FIN=()=>v.duration||32;
 function fase(t){return t<9.3?'noche':t<T_BOX_FIN?'vecinas':'joe'}
 function sync(){
-  const t=v.currentTime;
+  const t=v.currentTime;if(!fin&&v.duration&&t>=v.duration-7.75){fin=true;try{v.pause()}catch(e){};$('bar').style.display='none';document.documentElement.classList.add('escena-lista');setTimeout(()=>{$('bub').style.transition='opacity .6s';$('bub').style.opacity='0'},5000)}
   // cuadro de texto
   if(t<T_BOX_FIN){
     let d=D[0];for(const x of D)if(t>=x.desde)d=x;
@@ -142,7 +142,7 @@ function sync(){
 let last=performance.now();
 function frame(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
-  if(started&&!paused){
+  if(started&&!paused&&!fin){
     sync();em+=dt;const t=v.currentTime,f=fase(t);
     if(em>.25){em=0;
       if(f!=='joe'){if(Math.random()<.8)mote(Math.random()*1990,300+Math.random()*600,'#ffe9a0',false,2+Math.random()*3)}   // luciérnagas

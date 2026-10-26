@@ -115,7 +115,7 @@ export const GRUPOS = [
     tipo: "html",
     ruta: "/comic/escenas/01-barrio/index.html",
     poster: "/escenarios/esc-calle.jpg",
-    duracion: "≈ 0:35",
+    duracion: "≈ 0:30",
     guion: [
       {
         id: "c1-1",
