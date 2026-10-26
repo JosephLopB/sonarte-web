@@ -673,36 +673,7 @@ export const GRUPOS = [
     ruta: "/comic/escenas/07-estatua/index.html",
     poster: "/escenarios/esc-parque.jpg",
     duracion: "≈ 1:30",
-    puente: {
-      titulo: "El cuerpo se cansa",
-      epoca: "Capítulo III · Últimos años",
-      fondo: "/escenarios/esc-teatro.jpg",
-      nota:
-        "Escena del guion que no está en el montaje audiovisual. La recuperamos como puente antes de la estatua.",
-      lineas: [
-        L(
-          "El Centurión",
-          "Los años de escenario, de giras y de noches sin dormir empezaron a cobrar factura otra vez. Esta vez, Joe ya no se iba a recuperar del todo.",
-        ),
-        L("Joe", "El cuerpo se cansa... pero el alma todavía quiere rumba.", "con humor, para no preocupar a nadie"),
-        L("Acompañante", "Usted no para, ¿cierto?"),
-        L("Joe", "¿Y para qué pararía? Todavía me queda mucho que cantar."),
-      ],
-    },
     guion: [
-      {
-        id: "c3-3",
-        titulo: "El cuerpo se cansa",
-        estado: "puente",
-        narracion:
-          "Joe, ya mayor, se apoya en una silla de ruedas para llegar hasta otra silla, ayudado por alguien cercano. Los flashes de la prensa se disparan sin parar afuera.",
-        lineas: [
-          L("Joe", "El cuerpo se cansa... pero el alma todavía quiere rumba.", "con humor, para no preocupar a nadie"),
-          L("Acompañante", "Usted no para, ¿cierto?"),
-          L("Joe", "¿Y para qué pararía? Todavía me queda mucho que cantar."),
-        ],
-        nota: "Esta escena no está en el montaje audiovisual; se recupera como puente antes de la escena de la estatua.",
-      },
       {
         id: "c3-4",
         titulo: "26 de julio de 2011",

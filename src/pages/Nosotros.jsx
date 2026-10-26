@@ -15,7 +15,7 @@ const bloques = [
 ];
 
 /**
- * Cada integrante conserva su lenguaje (Yurani: menta, rosa y Akira; Joseph:
+ * Cada integrante conserva su lenguaje (Yurany: menta, rosa y Akira; Joseph:
  * papel crema, terracota y Garamond), pero ambos comparten la misma retícula:
  * retrato circular del mismo tamaño, nombre, rol, divisor, texto y firma.
  */
@@ -32,7 +32,7 @@ const LOOKS = {
     motivo: "espiral",
     retrato: "50% 8%",
   },
-  Yurani: {
+  Yurany: {
     fondo: "#C4F7E1",
     borde: "var(--color-marron)",
     nombre: "font-impacto text-marron",
@@ -96,7 +96,7 @@ function CardIntegrante({ p }) {
         perspective: 900,
       }}
     >
-      {/* Motivo de identidad: estrella para Yurani, espiral para Joseph. */}
+      {/* Motivo de identidad: estrella para Yurany, espiral para Joseph. */}
       <span
         className="pointer-events-none absolute -right-10 -top-10 opacity-[0.13]"
         aria-hidden="true"

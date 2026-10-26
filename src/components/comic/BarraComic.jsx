@@ -44,6 +44,7 @@ export function BarraComic({
   onPantalla,
   pantallaCompleta,
   listo,
+  puenteVisible = false,
 }) {
   const capitulo = CAPITULOS.find((c) => c.id === grupo.capitulo);
 
@@ -127,12 +128,18 @@ export function BarraComic({
           <button
             type="button"
             onClick={onSiguiente}
-            aria-label={indice === total - 1 ? "Terminar el cómic" : "Siguiente pieza"}
+            aria-label={
+              puenteVisible
+                ? "Siguiente diálogo"
+                : indice === total - 1
+                  ? "Terminar el cómic"
+                  : "Siguiente pieza"
+            }
             className={`ml-0.5 inline-flex h-9 items-center gap-1 rounded-full bg-turquesa px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-marron transition hover:brightness-105 sm:h-10 sm:px-4 ${
               listo ? "ring-2 ring-salmon ring-offset-2 ring-offset-[#0d0b09]" : ""
             }`}
           >
-            {indice === total - 1 ? "Finalizar" : "Siguiente"}
+            {puenteVisible ? "Siguiente" : indice === total - 1 ? "Finalizar" : "Siguiente"}
             <ChevronRight className="size-4" />
           </button>
         </div>

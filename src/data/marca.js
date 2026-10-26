@@ -70,16 +70,16 @@ export const VALORES = [
 export const EQUIPO = [
   {
     nombre: "Joseph",
-    rol: "Dirección de arte e ilustración",
-    texto:
-      "Construye los personajes, define el trazo y traduce la música en color y movimiento.",
-    img: asset("/img/equipo-joseph.jpg"),
-  },
-  {
-    nombre: "Yurani",
     rol: "Narrativa y diseño editorial",
     texto:
       "Investiga el folclore, escribe los guiones y da forma a la revista y a la voz de la marca.",
+    img: asset("/img/equipo-joseph.jpg"),
+  },
+  {
+    nombre: "Yurany",
+    rol: "Dirección de arte e ilustración",
+    texto:
+      "Construye los personajes, define el trazo y traduce la música en color y movimiento.",
     img: asset("/img/Yura.png"),
   },
 ];

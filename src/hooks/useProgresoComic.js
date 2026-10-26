@@ -6,6 +6,7 @@ const INICIAL = {
   completadas: [],
   extrasVistos: [],
   modoCine: false,
+  guiaVista: false,
   actualizado: null,
 };
 
@@ -19,6 +20,7 @@ function leer() {
       completadas: Array.isArray(crudo.completadas) ? crudo.completadas.filter((x) => typeof x === "string") : [],
       extrasVistos: Array.isArray(crudo.extrasVistos) ? crudo.extrasVistos.filter((x) => typeof x === "string") : [],
       modoCine: Boolean(crudo.modoCine),
+      guiaVista: Boolean(crudo.guiaVista),
       actualizado: typeof crudo.actualizado === "string" ? crudo.actualizado : null,
     };
   } catch {
@@ -67,9 +69,17 @@ export function useProgresoComic() {
     setProgreso((p) => ({ ...p, modoCine }));
   }, []);
 
-  const reiniciar = useCallback(() => {
-    setProgreso({ ...INICIAL, actualizado: new Date().toISOString() });
+  const marcarGuiaVista = useCallback(() => {
+    setProgreso((p) => (p.guiaVista ? p : { ...p, guiaVista: true }));
   }, []);
 
-  return { progreso, visitar, completar, marcarExtra, fijarModoCine, reiniciar };
+  const reiniciar = useCallback(() => {
+    setProgreso((p) => ({
+      ...INICIAL,
+      guiaVista: p.guiaVista,
+      actualizado: new Date().toISOString(),
+    }));
+  }, []);
+
+  return { progreso, visitar, completar, marcarExtra, fijarModoCine, marcarGuiaVista, reiniciar };
 }

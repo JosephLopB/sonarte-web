@@ -282,7 +282,7 @@ export default function Contacto() {
                 <Espiral className="size-9 shrink-0 text-terracota/60 anim-girar-lento" aria-hidden="true" />
                 <p>
                   SonArte es un proyecto independiente: detrás de cada respuesta estamos Joseph y
-                  Yurani.
+                  Yurany.
                 </p>
               </div>
             </Reveal>

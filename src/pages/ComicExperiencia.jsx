@@ -13,6 +13,7 @@ import { IndiceComic } from "../components/comic/IndiceComic.jsx";
 import { PanelComic } from "../components/comic/PanelComic.jsx";
 import { AvisoGirar } from "../components/comic/AvisoGirar.jsx";
 import { FinalComic } from "../components/comic/FinalComic.jsx";
+import { GuiaNavegacionComic } from "../components/comic/GuiaNavegacionComic.jsx";
 
 export default function ComicExperiencia() {
   const { escenaId } = useParams();
@@ -23,6 +24,7 @@ export default function ComicExperiencia() {
     completar,
     marcarExtra,
     fijarModoCine,
+    marcarGuiaVista,
     reiniciar,
   } = useProgresoComic();
   const {
@@ -44,11 +46,20 @@ export default function ComicExperiencia() {
   const [puenteVisible, setPuenteVisible] = useState(
     indiceInicial >= 0 ? Boolean(GRUPOS[indiceInicial].puente) : false,
   );
+  const [indicePuente, setIndicePuente] = useState(0);
   const [final, setFinal] = useState(false);
   const [barraVisible, setBarraVisible] = useState(true);
   const [reintento, setReintento] = useState(0);
   const [modoCine, setModoCine] = useState(progreso.modoCine);
   const [tardando, setTardando] = useState(false);
+  const [guiaAbierta, setGuiaAbierta] = useState(
+    () =>
+      !progreso.guiaVista &&
+      !progreso.escenaId &&
+      progreso.completadas.length === 0 &&
+      progreso.extrasVistos.length === 0 &&
+      !progreso.modoCine,
+  );
 
   const iframeRef = useRef(null);
   const videoRef = useRef(null);
@@ -84,6 +95,7 @@ export default function ComicExperiencia() {
     setIframeListo(false);
     setListo(false);
     setPuenteVisible(Boolean(grupo.puente));
+    setIndicePuente(0);
     setFinal(false);
     setBarraVisible(true);
     setTardando(false);
@@ -143,6 +155,10 @@ export default function ComicExperiencia() {
   const siguiente = useCallback(() => {
     if (!grupo || final) return;
     if (puenteVisible) {
+      if (indicePuente < grupo.puente.lineas.length - 1) {
+        setIndicePuente((actual) => actual + 1);
+        return;
+      }
       setPuenteVisible(false);
       setCargando(true);
       return;
@@ -154,7 +170,7 @@ export default function ComicExperiencia() {
       return;
     }
     irA(indice + 1);
-  }, [grupo, final, puenteVisible, indice, completar, irA]);
+  }, [grupo, final, puenteVisible, indicePuente, indice, completar, irA]);
 
   const anterior = useCallback(() => {
     if (indice > 0) irA(indice - 1);
@@ -228,11 +244,6 @@ export default function ComicExperiencia() {
     setIframeListo(false);
     setTardando(false);
     setReintento((n) => n + 1);
-  }, []);
-
-  const continuarPuente = useCallback(() => {
-    setPuenteVisible(false);
-    setCargando(true);
   }, []);
 
   /* Mensaje de "está tardando" y, más tarde, error si la pieza no responde. */
@@ -323,6 +334,7 @@ export default function ComicExperiencia() {
     const onKey = (e) => {
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (guiaAbierta) return;
       if (e.key === "ArrowRight") {
         e.preventDefault();
         accionesRef.current.siguiente?.();
@@ -350,7 +362,7 @@ export default function ComicExperiencia() {
       limpiar.forEach((fn) => fn());
       temporizadores.forEach((t) => clearTimeout(t));
     };
-  }, [iframeListo, grupo, marcarListo]);
+  }, [iframeListo, grupo, marcarListo, guiaAbierta]);
 
   /* Autoavance solo en modo cine, y solo cuando la pieza avisó que terminó. */
   useEffect(() => {
@@ -423,7 +435,7 @@ export default function ComicExperiencia() {
         }
         return;
       }
-      if (!grupo || panel || final) return;
+      if (!grupo || panel || final || guiaAbierta) return;
       if (e.key === "ArrowRight") {
         e.preventDefault();
         siguiente();
@@ -450,6 +462,7 @@ export default function ComicExperiencia() {
     grupo,
     panel,
     final,
+    guiaAbierta,
     siguiente,
     anterior,
     alternarPantalla,
@@ -466,6 +479,11 @@ export default function ComicExperiencia() {
     setIndice(-1);
     navigate("/comic/experiencia", { replace: true });
   }, [reiniciar, navigate]);
+
+  const cerrarGuia = useCallback(() => {
+    setGuiaAbierta(false);
+    marcarGuiaVista();
+  }, [marcarGuiaVista]);
 
   if (!grupo) {
     return (
@@ -511,8 +529,7 @@ export default function ComicExperiencia() {
           {puenteVisible ? (
             <PuenteComic
               grupo={grupo}
-              onContinuar={continuarPuente}
-              onSaltar={continuarPuente}
+              indiceLinea={indicePuente}
             />
           ) : (
             <EscenarioComic
@@ -547,6 +564,7 @@ export default function ComicExperiencia() {
           onPantalla={() => void alternarPantalla()}
           pantallaCompleta={pantallaCompleta}
           listo={listo}
+          puenteVisible={puenteVisible}
         />
       ) : null}
 
@@ -584,6 +602,8 @@ export default function ComicExperiencia() {
         extrasVistos={progreso.extrasVistos}
         onMarcarExtra={marcarExtra}
       />
+
+      {guiaAbierta ? <GuiaNavegacionComic onCerrar={cerrarGuia} /> : null}
 
       {!final ? <AvisoGirar onIntentarHorizontal={intentarHorizontal} /> : null}
     </div>

@@ -55,7 +55,7 @@ export function FinalComic({ onVolver, onCofre }) {
 
         <div className="mt-12 grid max-w-xl gap-3 text-left sm:grid-cols-3">
           {[
-            { t: "Historia", d: "Narrativa e investigación de Yurani." },
+            { t: "Historia", d: "Narrativa e investigación de Joseph." },
             { t: "Ilustración", d: "Dirección de arte e ilustración de Joseph." },
             { t: "Sonido", d: "Música, voces y ambientes del cómic." },
           ].map((c) => (
