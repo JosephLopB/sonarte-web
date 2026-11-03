@@ -18,6 +18,7 @@ export function PausaEvaluacion({ pausas, respuestas, onResponder, onMinimizar }
     [pausas],
   );
   const respondidas = preguntas.filter((pregunta) => respuestas[pregunta.id]).length;
+  const necesitaListaDesplazable = preguntas.length >= 3;
 
   useLayoutEffect(() => {
     if (!panel.current || minimizada || prefiereMenosMovimiento()) return;
@@ -124,9 +125,9 @@ export function PausaEvaluacion({ pausas, respuestas, onResponder, onMinimizar }
     <aside
       ref={panel}
       aria-label="Preguntas sobre el cómic"
-      className="absolute bottom-20 right-3 z-[75] flex max-h-[min(70svh,38rem)] w-[min(22rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-[1.35rem] border border-turquesa/25 bg-[#171310]/95 text-crema shadow-[0_24px_70px_-28px_rgba(0,0,0,.95)] backdrop-blur-xl sm:bottom-auto sm:right-5 sm:top-1/2 sm:-translate-y-1/2"
+      className={`absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-3 z-[75] grid max-h-[min(56svh,28rem)] w-[min(22rem,calc(100vw-1.5rem))] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-[1.35rem] border border-turquesa/25 bg-[#171310]/95 text-crema shadow-[0_24px_70px_-28px_rgba(0,0,0,.95)] backdrop-blur-xl sm:bottom-auto sm:right-5 sm:top-1/2 sm:max-h-[min(70svh,38rem)] sm:-translate-y-1/2 ${necesitaListaDesplazable ? "h-[min(56svh,28rem)] sm:h-[min(70svh,38rem)]" : "h-auto"}`}
     >
-      <header className="flex items-center justify-between gap-3 border-b border-crema/10 px-4 py-3">
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-crema/10 px-4 py-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="grid size-8 shrink-0 place-items-center rounded-full bg-turquesa/15 text-turquesa">
             <MessagesSquare className="size-4" aria-hidden="true" />
@@ -146,7 +147,10 @@ export function PausaEvaluacion({ pausas, respuestas, onResponder, onMinimizar }
         </button>
       </header>
 
-      <div ref={cuerpo} className="overflow-y-auto px-4 py-3">
+      <div
+        ref={cuerpo}
+        className="min-h-0 overflow-x-hidden overflow-y-auto overscroll-contain px-4 py-3"
+      >
         <p className="mb-3 flex items-center gap-2 text-[10px] leading-relaxed text-crema/50">
           <Sparkles className="size-3 shrink-0 text-turquesa" aria-hidden="true" />
           Estas preguntas aparecen al terminar cada capítulo. Respóndelas ahora o minimiza la pestaña y sigue leyendo.
@@ -174,7 +178,7 @@ export function PausaEvaluacion({ pausas, respuestas, onResponder, onMinimizar }
         <PistaEscala tono="oscuro" className="mt-2 border-t border-crema/10 pt-2" />
       </div>
 
-      <footer className="flex items-center justify-between gap-3 border-t border-crema/10 px-4 py-3">
+      <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-crema/10 px-4 py-3">
         <span className="text-[10px] text-crema/40">Tus respuestas se guardan en el recorrido.</span>
         <button
           type="button"
