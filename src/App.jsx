@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { SiteNav } from "./components/SiteNav.jsx";
 import { SiteFooter } from "./components/SiteFooter.jsx";
 import { BotonContacto } from "./components/BotonContacto.jsx";
@@ -10,7 +10,6 @@ import Revista from "./pages/Revista.jsx";
 import Proceso from "./pages/Proceso.jsx";
 import Contacto from "./pages/Contacto.jsx";
 import ComicExperiencia from "./pages/ComicExperiencia.jsx";
-import ExploracionComic from "./pages/ExploracionComic.jsx";
 import Evaluacion from "./pages/Evaluacion.jsx";
 
 function ScrollArriba() {
@@ -36,7 +35,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/comic" element={<Comic />} />
           <Route path="/comic/experiencia" element={<ComicExperiencia />} />
-          <Route path="/comic/experiencia/explorar" element={<ExploracionComic />} />
+          <Route path="/comic/experiencia/explorar" element={<Navigate to="/comic/experiencia" replace />} />
           <Route path="/comic/evaluacion" element={<Evaluacion />} />
           <Route path="/comic/experiencia/:escenaId" element={<ComicExperiencia />} />
           <Route path="/nosotros" element={<Nosotros />} />

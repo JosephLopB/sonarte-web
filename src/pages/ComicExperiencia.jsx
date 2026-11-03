@@ -16,6 +16,7 @@ import { FinalComic } from "../components/comic/FinalComic.jsx";
 import { GuiaNavegacionComic } from "../components/comic/GuiaNavegacionComic.jsx";
 import { PausaEvaluacion } from "../components/comic/PausaEvaluacion.jsx";
 import { CierreEvaluacion } from "../components/comic/CierreEvaluacion.jsx";
+import { ExploracionIntegrada } from "../components/comic/ExploracionIntegrada.jsx";
 import { useEvaluacionComic } from "../hooks/useEvaluacionComic.js";
 import { itemsDeEje, PAUSAS, pausaDeCapitulo } from "../data/evaluacion.js";
 
@@ -58,6 +59,7 @@ export default function ComicExperiencia() {
   const [tardando, setTardando] = useState(false);
   const [pausasVisibles, setPausasVisibles] = useState([]);
   const [cierre, setCierre] = useState(false);
+  const [exploracionAbierta, setExploracionAbierta] = useState(false);
   const evaluacion = useEvaluacionComic();
   const [guiaAbierta, setGuiaAbierta] = useState(
     () =>
@@ -73,6 +75,7 @@ export default function ComicExperiencia() {
   const escenarioRef = useRef(null);
   const timerBarra = useRef(null);
   const accionesRef = useRef({});
+  const mediosEnPausaRef = useRef([]);
 
   const grupo = GRUPOS[indice] ?? null;
   const total = GRUPOS.length;
@@ -221,6 +224,30 @@ export default function ComicExperiencia() {
     setExtraInicial(null);
   }, []);
 
+  const abrirExploracion = useCallback(() => {
+    const medios = [
+      videoRef.current,
+      ...Array.from(iframeRef.current?.contentDocument?.querySelectorAll("video") ?? []),
+    ].filter((medio, indice, lista) => medio && lista.indexOf(medio) === indice);
+    mediosEnPausaRef.current = medios.map((medio) => ({
+      medio,
+      tiempo: medio.currentTime,
+      reproduciendo: !medio.paused && !medio.ended,
+    }));
+    medios.forEach((medio) => medio.pause());
+    setExploracionAbierta(true);
+  }, []);
+
+  const cerrarExploracion = useCallback(() => {
+    setExploracionAbierta(false);
+    mediosEnPausaRef.current.forEach(({ medio, tiempo, reproduciendo }) => {
+      if (!reproduciendo || !medio?.isConnected) return;
+      if (Number.isFinite(tiempo)) medio.currentTime = tiempo;
+      medio.play?.().catch?.(() => {});
+    });
+    mediosEnPausaRef.current = [];
+  }, []);
+
   accionesRef.current = {
     siguiente,
     anterior,
@@ -356,7 +383,7 @@ export default function ComicExperiencia() {
     const onKey = (e) => {
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (guiaAbierta || cierre) return;
+      if (guiaAbierta || cierre || exploracionAbierta) return;
       if (e.key === "ArrowRight") {
         e.preventDefault();
         accionesRef.current.siguiente?.();
@@ -384,14 +411,14 @@ export default function ComicExperiencia() {
       limpiar.forEach((fn) => fn());
       temporizadores.forEach((t) => clearTimeout(t));
     };
-  }, [iframeListo, grupo, marcarListo, guiaAbierta, cierre]);
+  }, [iframeListo, grupo, marcarListo, guiaAbierta, cierre, exploracionAbierta]);
 
   /* Autoavance solo en modo cine, y solo cuando la pieza avisó que terminó. */
   useEffect(() => {
-    if (!modoCine || !listo || panel || final || puenteVisible || !grupo) return;
+    if (!modoCine || !listo || panel || final || puenteVisible || exploracionAbierta || !grupo) return;
     const t = setTimeout(() => siguiente(), 2800);
     return () => clearTimeout(t);
-  }, [modoCine, listo, panel, final, puenteVisible, grupo, siguiente]);
+  }, [modoCine, listo, panel, final, puenteVisible, exploracionAbierta, grupo, siguiente]);
 
   /* Barra que se oculta en modo cine y vuelve con el ratón o el tacto. */
   const mostrarBarra = useCallback(() => {
@@ -458,7 +485,7 @@ export default function ComicExperiencia() {
         }
         return;
       }
-      if (!grupo || panel || final || guiaAbierta) return;
+      if (!grupo || panel || final || guiaAbierta || exploracionAbierta) return;
       if (e.key === "ArrowRight") {
         e.preventDefault();
         siguiente();
@@ -486,6 +513,7 @@ export default function ComicExperiencia() {
     panel,
     final,
     guiaAbierta,
+    exploracionAbierta,
     cierre,
     siguiente,
     anterior,
@@ -586,6 +614,8 @@ export default function ComicExperiencia() {
           onSiguiente={siguiente}
           onIndice={abrirIndice}
           onGuion={abrirGuion}
+          onExplorar={abrirExploracion}
+          explorando={exploracionAbierta}
           onPantalla={() => void alternarPantalla()}
           pantallaCompleta={pantallaCompleta}
           listo={listo}
@@ -646,6 +676,15 @@ export default function ComicExperiencia() {
         extrasVistos={progreso.extrasVistos}
         onMarcarExtra={marcarExtra}
       />
+
+      {exploracionAbierta ? (
+        <ExploracionIntegrada
+          grupo={grupo}
+          extrasVistos={progreso.extrasVistos}
+          onMarcarExtra={marcarExtra}
+          onCerrar={cerrarExploracion}
+        />
+      ) : null}
 
       {guiaAbierta ? <GuiaNavegacionComic onCerrar={cerrarGuia} /> : null}
 

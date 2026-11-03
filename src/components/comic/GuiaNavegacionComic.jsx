@@ -28,8 +28,8 @@ const CONTROLES = [
   },
   {
     icono: Compass,
-    titulo: "Explora los escenarios",
-    descripcion: "Entra al recorrido interactivo para descubrir detalles de los espacios.",
+    titulo: "Explora esta escena",
+    descripcion: "Abre los detalles sobre la pieza actual y vuelve al mismo instante de lectura al cerrar.",
   },
   {
     icono: MessagesSquare,

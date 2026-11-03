@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Compass, LayoutGrid, Play, Sparkles } from "lucide-react";
+import { ArrowLeft, LayoutGrid, Play, Sparkles } from "lucide-react";
 import { asset } from "../../lib/asset.js";
 import { CAPITULOS, GRUPOS, grupoPorId } from "../../data/comicExperiencia.js";
 
@@ -77,13 +77,6 @@ export function PortadaComic({ progreso, onEmpezar, onContinuar, onIndice }) {
                 Ver capítulos
               </button>
 
-              <Link
-                to="/comic/experiencia/explorar"
-                className="inline-flex items-center gap-2 rounded-full border border-turquesa/35 bg-turquesa/[0.06] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-turquesa transition hover:border-turquesa/70 hover:bg-turquesa/10 hover:text-crema"
-              >
-                <Compass className="size-4" />
-                Explorar escenarios
-              </Link>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-crema/40">

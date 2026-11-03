@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   BookOpen,
@@ -10,6 +11,7 @@ import {
   Minimize2,
 } from "lucide-react";
 import { CAPITULOS } from "../../data/comicExperiencia.js";
+import { gsap, prefiereMenosMovimiento } from "../../lib/gsap.js";
 
 function Boton({ etiqueta, onClick, children, activo = false, disabled = false, destacado = false }) {
   return (
@@ -41,12 +43,48 @@ export function BarraComic({
   onSiguiente,
   onIndice,
   onGuion,
+  onExplorar,
+  explorando = false,
   onPantalla,
   pantallaCompleta,
   listo,
   puenteVisible = false,
 }) {
+  const botonExplorar = useRef(null);
+  const escenaAnterior = useRef(grupo.id);
   const capitulo = CAPITULOS.find((c) => c.id === grupo.capitulo);
+
+  useLayoutEffect(() => {
+    if (escenaAnterior.current === grupo.id) return;
+    escenaAnterior.current = grupo.id;
+    const boton = botonExplorar.current;
+    if (!boton || prefiereMenosMovimiento()) return;
+
+    const pulso = gsap.timeline();
+    pulso
+      .to(boton, {
+        scale: 1.15,
+        boxShadow: "0 0 0 5px rgba(76, 220, 190, 0.28), 0 0 24px rgba(76, 220, 190, 0.5)",
+        duration: 0.2,
+        ease: "power2.out",
+      })
+      .to(boton, { scale: 0.97, duration: 0.14, ease: "power2.in" })
+      .to(boton, {
+        scale: 1.08,
+        boxShadow: "0 0 0 3px rgba(76, 220, 190, 0.2), 0 0 16px rgba(76, 220, 190, 0.35)",
+        duration: 0.18,
+        ease: "power2.out",
+      })
+      .to(boton, {
+        scale: 1,
+        boxShadow: "0 0 0 0 rgba(76, 220, 190, 0)",
+        duration: 0.38,
+        ease: "bounce.out",
+        clearProps: "transform,boxShadow",
+      });
+
+    return () => pulso.kill();
+  }, [grupo.id]);
 
   return (
     <footer className="relative z-40 shrink-0 border-t border-crema/10 bg-[#0d0b09]/95 backdrop-blur-md">
@@ -108,14 +146,21 @@ export function BarraComic({
             <BookOpen className="size-4" />
           </Boton>
 
-          <Link
-            to="/comic/experiencia/explorar"
-            aria-label="Explorar escenarios"
-            title="Explorar escenarios"
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-turquesa/30 bg-turquesa/[0.06] text-turquesa transition hover:border-turquesa/70 hover:bg-turquesa/10 sm:size-10"
+          <button
+            ref={botonExplorar}
+            type="button"
+            onClick={onExplorar}
+            aria-label="Explorar esta escena"
+            title="Explorar esta escena"
+            aria-pressed={explorando}
+            className={`grid size-9 shrink-0 place-items-center rounded-full border transition sm:size-10 ${
+              explorando
+                ? "border-turquesa/50 bg-turquesa/10 text-turquesa"
+                : "border-crema/15 text-crema/65 hover:border-crema/35 hover:bg-crema/5 hover:text-crema"
+            }`}
           >
             <Compass className="size-4" aria-hidden="true" />
-          </Link>
+          </button>
 
           <Boton
             etiqueta={pantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
