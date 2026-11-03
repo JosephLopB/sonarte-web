@@ -1,7 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { gsap, ScrollTrigger, prefiereMenosMovimiento } from "../lib/gsap.js";
 import { Reveal } from "../components/Reveal.jsx";
+import { TeaserComic } from "../components/TeaserComic.jsx";
+import { ComicFondoSeccion } from "../components/ComicFondoSeccion.jsx";
+import { leerProgreso } from "../hooks/useProgresoComic.js";
+import { GRUPOS, grupoPorId } from "../data/comicExperiencia.js";
 import { FondoGrafico, OlasFlotantes } from "../components/FondoGrafico.jsx";
 import { EscenaPersonajes } from "../components/EscenaPersonajes.jsx";
 import { Espiral, EspiralDoble, PulsoSon, TrazoPincel, VinetaComic, Onda } from "../components/Espirales.jsx";
@@ -19,6 +24,9 @@ const tonos = ["text-terracota", "text-turquesa-medio", "text-salmon", "text-ver
 export default function Home() {
   const heroRef = useRef(null);
   const logoRef = useRef(null);
+  /* Lectura única: si alguien está a mitad del cómic, el inicio se lo recuerda. */
+  const [progreso] = useState(leerProgreso);
+  const ultimaPieza = progreso.escenaId ? grupoPorId(progreso.escenaId) : null;
 
   useEffect(() => {
     if (prefiereMenosMovimiento()) {
@@ -82,10 +90,10 @@ export default function Home() {
           </p>
           <div data-anim className="mt-9 flex flex-wrap justify-center gap-4" style={{ opacity: 0 }}>
             <Link
-              to="/comic"
+              to="/comic/experiencia"
               className="group inline-flex items-center gap-2 rounded-full superficie-caribe px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.16em] text-crema sombra-suave transition-all duration-500 hover:-translate-y-1 hover:sombra-flotante"
             >
-              Entra al cómic
+              Abrir el cómic
               <Espiral className="size-4 transition-transform duration-700 group-hover:rotate-180" />
             </Link>
             <Link
@@ -95,8 +103,85 @@ export default function Home() {
               Ver el proceso
             </Link>
           </div>
+
+          <div data-anim className="mt-5" style={{ opacity: 0 }}>
+            <Link
+              to="/comic"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-marron/55 underline decoration-terracota/30 decoration-2 underline-offset-4 transition-colors hover:text-terracota"
+            >
+              Ver las ocho piezas, el guion y los extras
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          </div>
+
+          {ultimaPieza ? (
+            <div data-anim className="mt-7 flex justify-center" style={{ opacity: 0 }}>
+              <Link
+                to={`/comic/experiencia/${progreso.escenaId}`}
+                className="group inline-flex max-w-full items-center gap-3 rounded-full border border-terracota/30 bg-crema/85 px-5 py-2.5 text-left backdrop-blur-sm transition-all duration-500 hover:-translate-y-0.5 hover:border-terracota/60 hover:sombra-suave"
+              >
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-terracota/10 text-terracota">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="size-4" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 3-6.7" strokeLinecap="round" />
+                    <path d="M3 4v5h5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-terracota">
+                    Seguir donde ibas
+                  </span>
+                  <span className="block truncate font-serif text-base text-marron">
+                    «{ultimaPieza.titulo}»
+                  </span>
+                </span>
+                <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.16em] text-marron/45">
+                  {progreso.completadas.length} de {GRUPOS.length}
+                </span>
+              </Link>
+            </div>
+          ) : null}
         </div>
       </section>
+
+      {/* Sección 1b — La invitación: la viñeta que se mueve */}
+      <ComicFondoSeccion className="py-24 text-crema sm:py-28">
+        <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-14 px-5 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
+          <Reveal>
+            <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-turquesa">
+              <span className="h-px w-10 rounded-full bg-turquesa/50" aria-hidden="true" />
+              El cómic
+            </p>
+            <h2 className="mt-5 font-serif text-4xl leading-[1.05] text-crema sm:text-5xl">
+              Ocho piezas para una vida que <span className="text-turquesa">se toca</span>
+            </h2>
+            <p className="mt-5 max-w-lg text-lg leading-relaxed text-crema/70">
+              El barrio, el Seminario, Radio Vigía, el hospital, el mundo. «Joe Arroyo: El Centurión
+              de la Noche» se recorre en menos de diez minutos, con sonido, luces que responden al
+              cursor y decisiones que cambian lo que sigue.
+            </p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-crema/45">
+              <span>Prólogo + 3 capítulos</span>
+              <span className="size-1 rounded-full bg-crema/25" aria-hidden="true" />
+              <span>≈ 8–10 min</span>
+              <span className="size-1 rounded-full bg-crema/25" aria-hidden="true" />
+              <span>Con sonido</span>
+            </div>
+
+            <Link
+              to="/comic"
+              className="mt-8 inline-flex items-center gap-2 rounded-full border border-crema/25 px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-crema/80 transition-all duration-500 hover:-translate-y-0.5 hover:border-crema/50 hover:bg-crema/5 hover:text-crema"
+            >
+              Ver el índice completo
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </Reveal>
+
+          <Reveal dir="scale" delay={0.12} className="pt-6">
+            <TeaserComic />
+          </Reveal>
+        </div>
+      </ComicFondoSeccion>
 
       {/* Sección 2 — ¿Qué hacemos? */}
       <section className="relative overflow-hidden superficie-mar py-28">

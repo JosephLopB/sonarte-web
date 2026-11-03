@@ -11,6 +11,7 @@ import Proceso from "./pages/Proceso.jsx";
 import Contacto from "./pages/Contacto.jsx";
 import ComicExperiencia from "./pages/ComicExperiencia.jsx";
 import ExploracionComic from "./pages/ExploracionComic.jsx";
+import Evaluacion from "./pages/Evaluacion.jsx";
 
 function ScrollArriba() {
   const { pathname } = useLocation();
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/comic" element={<Comic />} />
           <Route path="/comic/experiencia" element={<ComicExperiencia />} />
           <Route path="/comic/experiencia/explorar" element={<ExploracionComic />} />
+          <Route path="/comic/evaluacion" element={<Evaluacion />} />
           <Route path="/comic/experiencia/:escenaId" element={<ComicExperiencia />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/revista" element={<Revista />} />

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { gsap, prefiereMenosMovimiento } from "../lib/gsap.js";
 import { Reveal } from "../components/Reveal.jsx";
+import { ComicFondoSeccion } from "../components/ComicFondoSeccion.jsx";
 import { FondoGrafico } from "../components/FondoGrafico.jsx";
 import { VideoAutodetectado } from "../components/VideoAutodetectado.jsx";
 import { ESCENARIOS } from "../data/escenarios.js";
@@ -39,8 +40,66 @@ export default function Comic() {
   }, [i, cargando, dir]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-salmon pt-36 pb-24">
+    <section className="relative min-h-screen overflow-hidden bg-crema pt-36 pb-24">
       <FondoGrafico densidad={5} />
+
+      {/* El ingreso al cómic abre la página antes del teaser y los escenarios. */}
+      <ComicFondoSeccion className="min-h-[min(820px,88svh)] px-5 py-24 text-crema sm:py-32">
+        <div className="relative z-10 mx-auto grid min-h-[min(520px,62svh)] max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(16rem,0.7fr)] lg:gap-24">
+          <Reveal>
+            <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-turquesa">
+              <span className="h-px w-10 rounded-full bg-turquesa/60" aria-hidden="true" />
+              La experiencia completa
+            </p>
+            <h2 className="mt-5 max-w-2xl font-serif text-5xl leading-[0.98] text-crema sm:text-6xl lg:text-7xl">
+              Ábrelo y sube el <span className="text-turquesa">volumen</span>
+            </h2>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-crema/85">
+              Prólogo y tres capítulos con sonido, exploración libre y ventanas transmedia. Entra a
+              una historia que se escucha, se recorre y se toca.
+            </p>
+            <Link
+              to="/comic/experiencia"
+              className="mt-8 inline-flex items-center gap-3 rounded-full bg-turquesa px-8 py-4 font-serif text-lg text-marron shadow-[0_18px_45px_-20px_oklch(0.08_0.02_42/0.9)] transition-all duration-500 hover:-translate-y-1 hover:brightness-105"
+            >
+              <Play className="size-4 fill-current" />
+              Entrar al cómic interactivo
+              <ArrowRight className="size-5" aria-hidden="true" />
+            </Link>
+            <div className="mt-6">
+              <Link
+                to="/comic/evaluacion"
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-crema/65 underline decoration-crema/30 decoration-2 underline-offset-4 transition-colors hover:text-crema"
+              >
+                Ya lo leíste: cuéntanos cómo te fue
+              </Link>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12} className="lg:justify-self-end">
+            <ul className="space-y-5 border-l border-crema/35 pl-6 sm:pl-8">
+              <li>
+                <span className="block font-serif text-3xl text-crema">8 piezas</span>
+                <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-crema/65">
+                  Prólogo y tres capítulos
+                </span>
+              </li>
+              <li>
+                <span className="block font-serif text-3xl text-crema">8–10 min</span>
+                <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-crema/65">
+                  Una vida, de principio a fin
+                </span>
+              </li>
+              <li>
+                <span className="block font-serif text-3xl text-crema">Con sonido</span>
+                <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-crema/65">
+                  Escenas y detalles para explorar
+                </span>
+              </li>
+            </ul>
+          </Reveal>
+        </div>
+      </ComicFondoSeccion>
 
       <div className="relative z-10 mx-auto max-w-5xl px-5">
         <Reveal>
@@ -92,7 +151,7 @@ export default function Comic() {
           </figure>
 
           {cargando ? (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 bg-salmon">
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 bg-turquesa-medio">
               <div className="anim-rebote-logo">
                 <img
                   src={asset("/img/logo-icon.png")}
@@ -100,7 +159,7 @@ export default function Comic() {
                   className="w-24 rounded-full bg-crema p-3 sombra-flotante"
                 />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-[0.35em] text-marron/70">
+              <span className="text-xs font-semibold uppercase tracking-[0.35em] text-marron/80">
                 Afinando instrumentos
               </span>
             </div>
@@ -171,26 +230,8 @@ export default function Comic() {
             </Reveal>
           ))}
         </div>
-
-        {/* CTA al cómic interactivo */}
-        <Reveal dir="scale" delay={0.1} className="mt-20">
-          <div className="rounded-[2.5rem] superficie-profunda p-10 text-center sombra-flotante sm:p-14">
-            <p className="font-serif text-sm uppercase tracking-[0.35em] text-crema/85">La experiencia completa</p>
-            <h2 className="mt-4 font-serif text-4xl text-crema sm:text-5xl">Ábrelo y sube el volumen</h2>
-            <p className="mx-auto mt-4 max-w-xl text-crema/90">
-              Prólogo y tres capítulos con sonido, exploración libre y ventanas transmedia. El cómic
-              interactivo se abre en una experiencia a pantalla completa.
-            </p>
-            <Link
-              to="/comic/experiencia"
-              className="mt-8 inline-flex items-center gap-3 rounded-full bg-crema px-10 py-4 font-serif text-lg text-marron transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
-            >
-              Entrar al cómic interactivo
-              <ArrowRight className="size-5" />
-            </Link>
-          </div>
-        </Reveal>
       </div>
+
     </section>
   );
 }

@@ -14,6 +14,10 @@ import { PanelComic } from "../components/comic/PanelComic.jsx";
 import { AvisoGirar } from "../components/comic/AvisoGirar.jsx";
 import { FinalComic } from "../components/comic/FinalComic.jsx";
 import { GuiaNavegacionComic } from "../components/comic/GuiaNavegacionComic.jsx";
+import { PausaEvaluacion } from "../components/comic/PausaEvaluacion.jsx";
+import { CierreEvaluacion } from "../components/comic/CierreEvaluacion.jsx";
+import { useEvaluacionComic } from "../hooks/useEvaluacionComic.js";
+import { itemsDeEje, PAUSAS, pausaDeCapitulo } from "../data/evaluacion.js";
 
 export default function ComicExperiencia() {
   const { escenaId } = useParams();
@@ -52,6 +56,9 @@ export default function ComicExperiencia() {
   const [reintento, setReintento] = useState(0);
   const [modoCine, setModoCine] = useState(progreso.modoCine);
   const [tardando, setTardando] = useState(false);
+  const [pausasVisibles, setPausasVisibles] = useState([]);
+  const [cierre, setCierre] = useState(false);
+  const evaluacion = useEvaluacionComic();
   const [guiaAbierta, setGuiaAbierta] = useState(
     () =>
       !progreso.guiaVista &&
@@ -167,10 +174,25 @@ export default function ComicExperiencia() {
       completar(grupo.id);
       setFinal(true);
       setBarraVisible(false);
+      const pausaFinal = pausaDeCapitulo(grupo.capitulo);
+      if (pausaFinal && itemsDeEje(pausaFinal.eje).some((pregunta) => !evaluacion.respuestas[pregunta.id])) {
+        setPausasVisibles((actuales) => actuales.includes(grupo.capitulo) ? actuales : [...actuales, grupo.capitulo]);
+      }
       return;
     }
+
+    /* Al terminar el capítulo, la encuesta se suma al chat lateral sin bloquear
+       el avance ni interrumpir la lectura de la pieza siguiente. */
+    const proximo = GRUPOS[indice + 1];
+    const pausaActual = pausaDeCapitulo(grupo.capitulo);
+    if (proximo.capitulo !== grupo.capitulo && pausaActual) {
+      if (itemsDeEje(pausaActual.eje).some((pregunta) => !evaluacion.respuestas[pregunta.id])) {
+        setPausasVisibles((actuales) => actuales.includes(grupo.capitulo) ? actuales : [...actuales, grupo.capitulo]);
+      }
+    }
+
     irA(indice + 1);
-  }, [grupo, final, puenteVisible, indicePuente, indice, completar, irA]);
+  }, [grupo, final, puenteVisible, indicePuente, indice, completar, irA, evaluacion.respuestas]);
 
   const anterior = useCallback(() => {
     if (indice > 0) irA(indice - 1);
@@ -334,7 +356,7 @@ export default function ComicExperiencia() {
     const onKey = (e) => {
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (guiaAbierta) return;
+      if (guiaAbierta || cierre) return;
       if (e.key === "ArrowRight") {
         e.preventDefault();
         accionesRef.current.siguiente?.();
@@ -362,7 +384,7 @@ export default function ComicExperiencia() {
       limpiar.forEach((fn) => fn());
       temporizadores.forEach((t) => clearTimeout(t));
     };
-  }, [iframeListo, grupo, marcarListo, guiaAbierta]);
+  }, [iframeListo, grupo, marcarListo, guiaAbierta, cierre]);
 
   /* Autoavance solo en modo cine, y solo cuando la pieza avisó que terminó. */
   useEffect(() => {
@@ -424,6 +446,7 @@ export default function ComicExperiencia() {
     const onKey = (e) => {
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (cierre) return;
       if (e.key === "Escape") {
         if (panel) {
           setPanel(null);
@@ -463,6 +486,7 @@ export default function ComicExperiencia() {
     panel,
     final,
     guiaAbierta,
+    cierre,
     siguiente,
     anterior,
     alternarPantalla,
@@ -476,6 +500,7 @@ export default function ComicExperiencia() {
     setModoCine(false);
     setPanel(null);
     setFinal(false);
+    setPausasVisibles([]);
     setIndice(-1);
     navigate("/comic/experiencia", { replace: true });
   }, [reiniciar, navigate]);
@@ -575,6 +600,25 @@ export default function ComicExperiencia() {
             irA(0);
           }}
           onCofre={abrirCofre}
+          onEvaluar={() => setCierre(true)}
+        />
+      ) : null}
+
+      {pausasVisibles.length ? (
+        <PausaEvaluacion
+          pausas={PAUSAS.filter((item) => pausasVisibles.includes(item.capitulo))}
+          respuestas={evaluacion.respuestas}
+          onResponder={evaluacion.responder}
+        />
+      ) : null}
+
+      {cierre ? (
+        <CierreEvaluacion
+          respuestas={evaluacion.respuestas}
+          onResponder={evaluacion.responder}
+          pausasSaltadas={evaluacion.pausasSaltadas}
+          onCerrar={() => setCierre(false)}
+          onVerFormulario={() => navigate("/comic/evaluacion")}
         />
       ) : null}
 
@@ -605,7 +649,11 @@ export default function ComicExperiencia() {
 
       {guiaAbierta ? <GuiaNavegacionComic onCerrar={cerrarGuia} /> : null}
 
-      {!final ? <AvisoGirar onIntentarHorizontal={intentarHorizontal} /> : null}
+      {/* El aviso de girar cubre todo: no debe tapar una pausa ni el cierre, que sí
+          se leen en vertical. */}
+      {!final && !cierre ? (
+        <AvisoGirar onIntentarHorizontal={intentarHorizontal} />
+      ) : null}
     </div>
   );
 }

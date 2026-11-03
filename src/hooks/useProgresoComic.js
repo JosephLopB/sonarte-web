@@ -10,7 +10,8 @@ const INICIAL = {
   actualizado: null,
 };
 
-function leer() {
+/** Progreso guardado, sin suscribirse a él: lo usa el inicio para invitar a seguir. */
+export function leerProgreso() {
   if (typeof window === "undefined") return INICIAL;
   try {
     const crudo = JSON.parse(window.localStorage.getItem(CLAVE) || "null");
@@ -30,7 +31,7 @@ function leer() {
 
 /** Progreso del cómic en localStorage: pieza actual, completadas y extras vistos. */
 export function useProgresoComic() {
-  const [progreso, setProgreso] = useState(leer);
+  const [progreso, setProgreso] = useState(leerProgreso);
   const primera = useRef(true);
 
   useEffect(() => {

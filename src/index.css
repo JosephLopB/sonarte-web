@@ -219,6 +219,16 @@
   }
 }
 
+@keyframes acercar {
+  0%,
+  100% {
+    transform: scale(1.03) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.13) translate3d(-1.5%, -1%, 0);
+  }
+}
+
 @keyframes girar-lento {
   from {
     transform: rotate(0deg);
@@ -250,6 +260,70 @@
 
 @utility anim-girar-lento {
   animation: girar-lento 40s linear infinite;
+}
+
+@utility anim-acercar {
+  animation: acercar 26s var(--ease-smooth) infinite;
+}
+
+/* El flyer crece al entrar en el viewport y se funde con las secciones crema. */
+.comic-flyer-marco {
+  transform-origin: center center;
+  will-change: transform, border-radius;
+}
+
+.comic-flyer-seccion {
+  background-color: var(--color-crema);
+}
+
+.comic-flyer-imagen {
+  object-position: center top;
+  will-change: transform;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .comic-flyer-imagen {
+    top: -60%;
+    height: 220%;
+  }
+}
+
+.comic-flyer-sombra {
+  background: linear-gradient(
+    100deg,
+    oklch(0.16 0.025 45 / 82%) 0%,
+    oklch(0.16 0.025 45 / 68%) 42%,
+    oklch(0.16 0.025 45 / 38%) 100%
+  );
+}
+
+.comic-flyer-mezcla {
+  background: linear-gradient(
+    to bottom,
+    var(--color-crema) 0%,
+    color-mix(in oklab, var(--color-crema) 62%, transparent) 5%,
+    color-mix(in oklab, var(--color-crema) 12%, transparent) 14%,
+    transparent 22%,
+    transparent 78%,
+    color-mix(in oklab, var(--color-crema) 62%, transparent) 91%,
+    var(--color-crema) 100%
+  );
+}
+
+@media (max-width: 640px) {
+  .comic-flyer-imagen {
+    object-position: center top;
+  }
+
+  .comic-flyer-sombra {
+    background: linear-gradient(
+      to bottom,
+      oklch(0.16 0.025 45 / 42%) 0%,
+      oklch(0.16 0.025 45 / 68%) 28%,
+      oklch(0.16 0.025 45 / 70%) 75%,
+      oklch(0.16 0.025 45 / 48%) 100%
+    );
+  }
 }
 
 /* Aviso de orientación del cómic: solo móviles en vertical. */

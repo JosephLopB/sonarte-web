@@ -1,8 +1,8 @@
-import { ArrowLeft, Award, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Award, MessagesSquare, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { asset } from "../../lib/asset.js";
 
-export function FinalComic({ onVolver, onCofre }) {
+export function FinalComic({ onVolver, onCofre, onEvaluar }) {
   return (
     <div className="absolute inset-0 z-[60] overflow-y-auto bg-[#080706] text-crema">
       <img
@@ -27,7 +27,31 @@ export function FinalComic({ onVolver, onCofre }) {
           El Centurión
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        {onEvaluar ? (
+          <div className="mt-9 w-full max-w-lg rounded-2xl border border-turquesa/30 bg-turquesa/[0.07] p-5 text-left">
+            <p className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.24em] text-turquesa">
+              <MessagesSquare className="size-3" aria-hidden="true" />
+              Última página
+            </p>
+            <p className="mt-2 font-serif text-xl leading-tight text-crema">
+              Antes de cerrar el telón, cuéntanos cómo fue
+            </p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-crema/55">
+              La historia, el proyecto y tu experiencia. Si vienes de educación o del mundo editorial,
+              también tenemos preguntas para conocer ese interés.
+            </p>
+            <button
+              type="button"
+              onClick={onEvaluar}
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-crema px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-marron transition hover:-translate-y-0.5 hover:brightness-105"
+            >
+              Compartir mi opinión
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </button>
+          </div>
+        ) : null}
+
+        <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={onCofre}

@@ -6,6 +6,7 @@ import {
   Home,
   LayoutGrid,
   Maximize2,
+  MessagesSquare,
   X,
 } from "lucide-react";
 
@@ -29,6 +30,12 @@ const CONTROLES = [
     icono: Compass,
     titulo: "Explora los escenarios",
     descripcion: "Entra al recorrido interactivo para descubrir detalles de los espacios.",
+  },
+  {
+    icono: MessagesSquare,
+    titulo: "Opina sin salir",
+    descripcion:
+      "Al cerrar cada capítulo aparece una pestaña lateral con preguntas breves. Puedes minimizarla y seguir leyendo; el contador guarda tu avance.",
   },
   {
     icono: Maximize2,

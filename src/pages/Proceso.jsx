@@ -20,6 +20,7 @@ function TarjetaEtapa({ etapa, onAbrir }) {
 
   return (
     <article
+      data-etapa-card
       className={`flex h-[70vh] w-[86vw] shrink-0 flex-col overflow-hidden rounded-[2.25rem] p-7 sm:w-[34rem] sm:p-9 ${
         oscura
           ? "superficie-profunda text-crema sombra-flotante"
@@ -120,6 +121,29 @@ export default function Proceso() {
       };
     });
 
+    /* Móvil: cada tarjeta entra alternando desde los lados, según el recorrido. */
+    mm.add("(max-width: 767px) and (prefers-reduced-motion: no-preference)", () => {
+      const tarjetas = gsap.utils.toArray(track.current.querySelectorAll("[data-etapa-card]"));
+
+      tarjetas.forEach((tarjeta, indice) => {
+        gsap.fromTo(
+          tarjeta,
+          { autoAlpha: 0, x: indice % 2 === 0 ? -64 : 64 },
+          {
+            autoAlpha: 1,
+            x: 0,
+            duration: 1.2,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: tarjeta,
+              start: "top 112%",
+              toggleActions: "play none none reverse",
+            },
+          },
+        );
+      });
+    });
+
     return () => mm.revert();
   }, []);
 
@@ -152,7 +176,7 @@ export default function Proceso() {
           ))}
 
           {/* Cierre del recorrido */}
-          <article className="flex h-[70vh] w-[86vw] shrink-0 flex-col items-center justify-center gap-6 rounded-[2.25rem] superficie-caribe p-10 text-center text-crema sombra-flotante sm:w-[30rem]">
+          <article data-etapa-card className="flex h-[70vh] w-[86vw] shrink-0 flex-col items-center justify-center gap-6 rounded-[2.25rem] superficie-caribe p-10 text-center text-crema sombra-flotante sm:w-[30rem]">
             <Espiral className="size-16 anim-girar-lento" />
             <h2 className="font-serif text-3xl">El espiral vuelve a empezar</h2>
             <p className="max-w-xs text-sm leading-relaxed text-crema/90">
