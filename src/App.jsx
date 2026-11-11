@@ -11,6 +11,8 @@ import Proceso from "./pages/Proceso.jsx";
 import Contacto from "./pages/Contacto.jsx";
 import ComicExperiencia from "./pages/ComicExperiencia.jsx";
 import Evaluacion from "./pages/Evaluacion.jsx";
+import LandingLectores from "./pages/LandingLectores.jsx";
+import LandingOrganizaciones from "./pages/LandingOrganizaciones.jsx";
 
 function ScrollArriba() {
   const { pathname } = useLocation();
@@ -24,12 +26,16 @@ export default function App() {
   const { pathname } = useLocation();
   // La experiencia del cómic ocupa la pantalla completa: sin nav, burbuja ni footer.
   const esExperiencia = pathname.startsWith("/comic/experiencia");
+  // Las landings de invitación se comparten por enlace directo y viven fuera
+  // de la navegación del sitio.
+  const esLanding = ["/lectores", "/organizaciones"].includes(pathname.replace(/\/+$/, ""));
+  const sinMarcoSitio = esExperiencia || esLanding;
 
   return (
-    <div className={esExperiencia ? "" : "min-h-screen"}>
+    <div className={sinMarcoSitio ? "" : "min-h-screen"}>
       <ScrollArriba />
-      {!esExperiencia && <SiteNav />}
-      {!esExperiencia && <BotonContacto />}
+      {!sinMarcoSitio && <SiteNav />}
+      {!sinMarcoSitio && <BotonContacto />}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -37,6 +43,8 @@ export default function App() {
           <Route path="/comic/experiencia" element={<ComicExperiencia />} />
           <Route path="/comic/experiencia/explorar" element={<Navigate to="/comic/experiencia" replace />} />
           <Route path="/comic/evaluacion" element={<Evaluacion />} />
+          <Route path="/lectores" element={<LandingLectores />} />
+          <Route path="/organizaciones" element={<LandingOrganizaciones />} />
           <Route path="/comic/experiencia/:escenaId" element={<ComicExperiencia />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/revista" element={<Revista />} />
@@ -45,7 +53,7 @@ export default function App() {
           <Route path="*" element={<Home />} />
         </Routes>
       </main>
-      {!esExperiencia && <SiteFooter />}
+      {!sinMarcoSitio && <SiteFooter />}
     </div>
   );
 }

@@ -9,15 +9,15 @@ import { ESCALA } from "../../data/evaluacion.js";
 const TONOS = {
   claro: {
     escala:
-      "border-marron/20 text-marron/70 hover:border-terracota/60 hover:text-terracota peer-checked:border-terracota peer-checked:bg-terracota peer-checked:text-crema peer-focus-visible:ring-terracota/25",
-    chip: "border-marron/20 text-marron/70 hover:border-terracota/60 hover:text-terracota peer-checked:border-marron peer-checked:bg-marron peer-checked:text-crema peer-focus-visible:ring-terracota/25",
-    pista: "text-marron/45",
+      "border-marron/40 text-marron/90 hover:border-terracota/80 hover:text-terracota peer-checked:border-terracota peer-checked:bg-terracota peer-checked:text-crema peer-focus-visible:ring-terracota/25",
+    chip: "border-marron/40 text-marron/90 hover:border-terracota/80 hover:text-terracota peer-checked:border-marron peer-checked:bg-marron peer-checked:text-crema peer-focus-visible:ring-terracota/25",
+    pista: "text-marron/75",
   },
   oscuro: {
     escala:
-      "border-crema/20 text-crema/65 hover:border-turquesa/70 hover:text-turquesa peer-checked:border-turquesa peer-checked:bg-turquesa peer-checked:text-marron peer-focus-visible:ring-turquesa/30",
-    chip: "border-crema/20 text-crema/70 hover:border-turquesa/60 hover:text-turquesa peer-checked:border-turquesa peer-checked:bg-turquesa peer-checked:text-marron peer-focus-visible:ring-turquesa/30",
-    pista: "text-crema/40",
+      "border-crema/50 text-crema hover:border-turquesa hover:text-turquesa peer-checked:border-turquesa peer-checked:bg-turquesa peer-checked:text-marron peer-focus-visible:ring-turquesa/30",
+    chip: "border-crema/50 text-crema hover:border-turquesa hover:text-turquesa peer-checked:border-turquesa peer-checked:bg-turquesa peer-checked:text-marron peer-focus-visible:ring-turquesa/30",
+    pista: "text-crema/80",
   },
 };
 

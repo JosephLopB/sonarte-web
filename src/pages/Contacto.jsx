@@ -14,6 +14,7 @@ import { Reveal } from "../components/Reveal.jsx";
 import { Espiral } from "../components/Espirales.jsx";
 import { CONTACTO } from "../data/sitio.js";
 import { asset } from "../lib/asset.js";
+import { RedesSociales } from "../components/RedesSociales.jsx";
 
 const VACIO = { nombre: "", correo: "", asunto: CONTACTO.asuntos[0].valor, mensaje: "" };
 const CORREO_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -274,6 +275,10 @@ export default function Contacto() {
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   Cada mensaje que sale del formulario llega a esta misma bandeja.
                 </p>
+                <p className="mt-5 mb-2 text-xs font-bold uppercase tracking-[0.16em] text-marron">
+                  También puedes encontrarnos en
+                </p>
+                <RedesSociales tono="claro" />
               </div>
             </Reveal>
 

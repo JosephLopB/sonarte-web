@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { MARCA } from "../data/marca.js";
 import { CONTACTO } from "../data/sitio.js";
 import { asset } from "../lib/asset.js";
+import { RedesSociales } from "./RedesSociales.jsx";
 
 export function SiteFooter() {
   return (
@@ -80,6 +81,8 @@ export function SiteFooter() {
           >
             {CONTACTO.correo}
           </a>
+          <p className="mt-5 mb-2 text-xs font-bold uppercase tracking-[0.16em] text-crema">Síguenos</p>
+          <RedesSociales tono="oscuro" className="max-w-xs" />
         </div>
       </div>
 

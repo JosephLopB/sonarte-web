@@ -48,6 +48,7 @@ export function construirRegistro(respuestas, meta = {}) {
   agregar("Progreso del cómic", meta.progreso ?? "");
   agregar("Pausas saltadas", pausasTexto(meta.pausasSaltadas));
   agregar("Segundos en la encuesta", meta.segundos ?? "");
+  if (meta.origenLanding) agregar("Origen landing", meta.origenLanding);
   agregar("Página", meta.pagina ?? "");
 
   return { columnas, valores };
